@@ -1,0 +1,11 @@
+<h1>Twstat#index</h1>
+
+<!--
+<%= form_tag({ :controller => 'twstat', :action => 'dashboard' }, :method => :get) do %>
+  <%= label_tag 'username', 'Enter user name: ' %>
+  <%= text_field_tag 'username', '', :size => 20 %>
+  <%= submit_tag 'Go to Dashboard' %>
+<% end %>
+-->
+
+<%= link_to image_tag('/assets/sign-in-with-twitter-gray.png'), { :controller=>'twstat', :action=>'login' } %>
