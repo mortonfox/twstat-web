@@ -1,11 +1,9 @@
 TwstatWeb::Application.routes.draw do
   get 'twstat/index'
   get 'twstat/login'
+  get 'twstat/logout'
   get 'twstat/oauth'
-
   get 'twstat/dashboard'
-  get 'twstat/dashboard/:user' => 'twstat#dashboard'
-
   get 'twstat/report'
 
   get 'twstat' => 'twstat#index'
