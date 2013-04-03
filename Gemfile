@@ -24,7 +24,8 @@ gem 'jquery-rails'
 
 gem 'oauth'
 gem 'json'
-# gem 'twitter'
+
+gem 'delayed_job_active_record'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
