@@ -58,6 +58,10 @@ class TwstatController < ApplicationController
     @do_refresh = @user_status[:status] == 'busy'
   end
 
+  def upload
+
+  end
+
   def report
   end
 end

@@ -5,6 +5,7 @@ TwstatWeb::Application.routes.draw do
   get 'twstat/oauth'
   get 'twstat/dashboard'
   get 'twstat/report'
+  get 'twstat/upload'
 
   get 'twstat' => 'twstat#index'
   root :to => 'twstat#index'
