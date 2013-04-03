@@ -1,6 +1,26 @@
 <h1>Twstat#dashboard</h1>
-<p>Find me in app/views/twstat/dashboard.html.erb</p>
 
 <p>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</p>
+
+<% if @user_status[:status] == 'busy' %>
+
+  <p>
+  Processing Twitter archive... <br />
+  <%= @user_status[:tweetsDone] %> tweets back to 
+  <%= @user_status[:untilDate] %>
+
+<% else %>  
+
+  <p>
+  <% if @user.report %>
+    <%= link_to 'View report', :action => 'report' %>
+  <% else %>
+    No saved report.
+  <% end %>
+
+  <p>
+  Upload report...
+
+<% end %>
 
 <p><%= link_to 'Logout', :action => 'logout' %>

@@ -48,6 +48,14 @@ class TwstatController < ApplicationController
   end
 
   def dashboard
+    @user = User.find_by_userid(session[:userid])
+
+    @user_status = if @user.status
+                     JSON.parse @user.status
+                   else
+                     { :status => 'ready', :tweetsDone => 0, :untilDate => '' }
+                   end
+    @do_refresh = @user_status[:status] == 'busy'
   end
 
   def report
