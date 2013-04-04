@@ -1,3 +1,5 @@
+require 'tempfile'
+require 'zip/zipfilesystem'
 
 class TwstatController < ApplicationController
 
@@ -6,7 +8,7 @@ class TwstatController < ApplicationController
 
   def index
     if session[:userid]
-      redirect_to :action => 'dashboard'
+      redirect_to :action => :dashboard
       return
     end
   end
@@ -25,12 +27,12 @@ class TwstatController < ApplicationController
   def logout
     session[:userid] = nil
     session[:username] = nil
-    redirect_to :action => 'index'
+    redirect_to :action => :index
   end
 
   def oauth
     unless params[:oauth_verifier]
-      redirect_to :action => 'index'
+      redirect_to :action => :index
       return
     end
 
@@ -50,12 +52,12 @@ class TwstatController < ApplicationController
       u.username = session[:username] 
     }
     
-    redirect_to :action => 'dashboard'
+    redirect_to :action => :dashboard
   end
 
   def dashboard
     unless session[:userid]
-      redirect_to :action => 'index'
+      redirect_to :action => :index
       return
     end
 
@@ -70,7 +72,14 @@ class TwstatController < ApplicationController
   end
 
   def upload
+    uploaded_file = params[:tweetdata]
+    @uploadtemp = Tempfile.new ['tweetdata', '.zip'], :encoding => 'ascii-8bit'
+    @uploadtemp.write uploaded_file.read
+    @uploadtemp.close
 
+    Zip::ZipFile.open(@uploadtemp.path) { |zipf|
+      @zipentries = zipf.entries
+    }
   end
 
   def report

@@ -11,16 +11,22 @@
 
 <% else %>  
 
+  <% if @user_status[:status] == 'error' %>
+    <p class="error"><%= @user_status[:errorMsg] %></p>
+  <% end %>
+
   <p>
   <% if @user.report %>
-    <%= link_to 'View report', :action => 'report' %>
+    <%= link_to 'View report', :action => :report %>
   <% else %>
     No saved report.
   <% end %>
 
-  <p>
-  Upload report...
+  <%= form_tag({ :action => :upload }, :multipart => true) do %>
+    tweets.zip file: <%= file_field_tag :tweetdata %>
+    <%= submit_tag('Upload') %>
+  <% end %>
 
 <% end %>
 
-<p><%= link_to 'Logout', :action => 'logout' %>
+<p><%= link_to 'Logout', :action => :logout %>
