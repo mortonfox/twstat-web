@@ -7,6 +7,7 @@ class TwstatController < ApplicationController
   def index
     if session[:userid]
       redirect_to :action => 'dashboard'
+      return
     end
   end
 
@@ -28,6 +29,11 @@ class TwstatController < ApplicationController
   end
 
   def oauth
+    unless params[:oauth_verifier]
+      redirect_to :action => 'index'
+      return
+    end
+
     oauth = OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET,
                                 { :site => "https://api.twitter.com" })
     request_token = OAuth::RequestToken.new(oauth, session[:request_token],
@@ -48,6 +54,11 @@ class TwstatController < ApplicationController
   end
 
   def dashboard
+    unless session[:userid]
+      redirect_to :action => 'index'
+      return
+    end
+
     @user = User.find_by_userid(session[:userid])
 
     @user_status = if @user.status
