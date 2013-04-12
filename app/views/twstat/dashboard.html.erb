@@ -2,17 +2,17 @@
 
 <p>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</p>
 
-<% if @user_status[:status] == 'busy' %>
+<% if @user_status['status'] == 'busy' %>
 
   <p>
   Processing Twitter archive... <br />
-  <%= @user_status[:tweetsDone] %> tweets back to 
-  <%= @user_status[:untilDate] %>
+  <%= @user_status['tweetsDone'] %> tweets back to 
+  <%= @user_status['untilDate'] %>
 
 <% else %>  
 
-  <% if @user_status[:status] == 'error' %>
-    <p class="error"><%= @user_status[:errorMsg] %></p>
+  <% if @user_status['status'] == 'error' %>
+    <p class='error'><%= @user_status['errorMsg'] %></p>
   <% end %>
 
   <p>
