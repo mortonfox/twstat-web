@@ -1,10 +1,21 @@
 require 'tempfile'
+require 'csv'
 require 'zip/zipfilesystem'
 
 class TwstatController < ApplicationController
 
   CONSUMER_KEY = 'kENAx1tEBxoalX9e7dMuw'
   CONSUMER_SECRET = 'A7XNOF3XWpyAdILj0k5IPuUWeCwV6AKiEvzkFuPFE'
+
+  def initialize
+    super
+
+    @COUNT_DEFS = {
+      :alltime => { :title => 'all time', :days => nil, },
+      :last30 => { :title => 'last 30 days', :days => 30, },
+    }
+
+  end
 
   def index
     if session[:userid]
@@ -82,6 +93,17 @@ class TwstatController < ApplicationController
     }
   end
 
+
   def report
+    @by_month_data = nil
+    @by_month_min = nil
+    @by_month_max = nil
+    @by_dow_data = {}
+    @by_hour_data = {}
+    @by_mention_data = {}
+    @by_source_data = {}
+    @by_words_data = {}
+    @subtitle = ''
+    render :template => 'twstat/report', :layout => false
   end
 end
