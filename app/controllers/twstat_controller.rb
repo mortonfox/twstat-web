@@ -304,7 +304,8 @@ class TwstatController < ApplicationController
       return
     end
 
-    @user = User.find_by_userid(session[:userid])
+    @userid = session[:userid]
+    @user = User.find_by_userid @userid
 
     @user_status = if @user.status
                      JSON.parse @user.status

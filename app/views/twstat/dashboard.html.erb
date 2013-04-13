@@ -17,7 +17,7 @@
 
   <p>
   <% if @user.report %>
-    <%= link_to 'View report', :action => :report %>
+    <%= link_to 'View report', :action => :report, :userid => @userid %>
   <% else %>
     No saved report.
   <% end %>
