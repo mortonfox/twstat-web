@@ -18,51 +18,51 @@
 	  "use strict";
 
           draw_by_month(
-              [ <%= @by_month_data %> ], 
+              [ <%== @by_month_data %> ], 
               new Date(<%= @by_month_min %>), 
               new Date(<%= @by_month_max %>)
           );
 
           draw_by_dow(
-              [ <%= @by_dow_data[:alltime] %> ],
+              [ <%== @by_dow_data['alltime'] %> ],
               "Tweets by Day of Week (<%= @COUNT_DEFS[:alltime][:title] %>)",
               "by_dow_alltime"
           );
           draw_by_dow(
-              [ <%= @by_dow_data[:last30] %> ],
+              [ <%== @by_dow_data['last30'] %> ],
               "Tweets by Day of Week (<%= @COUNT_DEFS[:last30][:title] %>)",
               "by_dow_last30"
           );
 
           draw_by_hour(
-              [ <%= @by_hour_data[:alltime] %> ],
+              [ <%== @by_hour_data['alltime'] %> ],
               "Tweets by Hour (<%= @COUNT_DEFS[:alltime][:title] %>)",
               "by_hour_alltime"
           );
           draw_by_hour(
-              [ <%= @by_hour_data[:last30] %> ],
+              [ <%== @by_hour_data['last30'] %> ],
               "Tweets by Hour (<%= @COUNT_DEFS[:last30][:title] %>)",
               "by_hour_last30"
           );
 
           draw_by_mention(
-              [ <%= @by_mention_data[:alltime] %> ],
+              [ <%== @by_mention_data['alltime'] %> ],
               "Top Mentions (<%= @COUNT_DEFS[:alltime][:title] %>)",
               "by_mention_alltime"
           );
           draw_by_mention(
-              [ <%= @by_mention_data[:last30] %> ],
+              [ <%== @by_mention_data['last30'] %> ],
               "Top Mentions (<%= @COUNT_DEFS[:last30][:title] %>)",
               "by_mention_last30"
           );
 
           draw_by_mention(
-              [ <%= @by_source_data[:alltime] %> ],
+              [ <%== @by_source_data['alltime'] %> ],
               "Top Clients (<%= @COUNT_DEFS[:alltime][:title] %>)",
               "by_source_alltime"
           );
           draw_by_mention(
-              [ <%= @by_source_data[:last30] %> ],
+              [ <%== @by_source_data['last30'] %> ],
               "Top Clients (<%= @COUNT_DEFS[:last30][:title] %>)",
               "by_source_last30"
           );
@@ -75,11 +75,11 @@
 	  "use strict";
 
           cloud_by_words(
-              [ <%= @by_words_data[:alltime] %> ],
+              [ <%== @by_words_data['alltime'] %> ],
               "by_words_alltime"
           );
           cloud_by_words(
-              [ <%= @by_words_data[:last30] %> ],
+              [ <%== @by_words_data['last30'] %> ],
               "by_words_last30"
           );
       });

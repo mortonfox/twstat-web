@@ -2,6 +2,28 @@ require 'tempfile'
 require 'csv'
 require 'zip/zipfilesystem'
 
+def update_status userid, status, tweetsDone, untilDate, report=nil
+  datestr = case untilDate
+            when Time
+              untilDate.strftime '%Y-%m-%d'
+            else
+              untilDate
+            end
+
+  user = User.find_by_userid userid
+  user.status = {
+    'status' => status,
+    'tweetsDone' => tweetsDone,
+    'untilDate' => datestr,
+  }.to_json
+
+  if report
+    user.report = report
+  end
+
+  user.save
+end
+
 class TweetStats
 
   COUNT_DEFS = {
@@ -28,7 +50,10 @@ class TweetStats
 
   attr_reader :row_count
 
-  def initialize
+  def initialize userid, zipfile
+    @userid = userid
+    @zipfile = zipfile
+
     @count_by_month = {}
 
     @all_counts = {}
@@ -47,7 +72,7 @@ class TweetStats
     @oldest_tstamp = nil
   end
 
-  PROGRESS_INTERVAL = 500
+  PROGRESS_INTERVAL = 100
 
   def process_row row
     @row_count += 1
@@ -62,8 +87,7 @@ class TweetStats
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      print "Processing row #{@row_count} (#{tstamp.strftime '%Y-%m-%d'}) ...\r"
-      $stdout.flush
+      update_status @userid, 'busy', @row_count, tstamp
     end
 
     # Save the newest timestamp because any last N days stat refers to N
@@ -129,15 +153,17 @@ class TweetStats
     "<div class=\"tooltip\"><strong>#{category}</strong><br />#{count} tweets</div>"
   end
 
-  def report_html outfname
+  def gen_report 
+    report_data = {}
+
     months = @count_by_month.keys.sort { |a, b| a[0] <=> b[0] }
-    by_month_data = months.map { |mon|
+    report_data['by_month_data'] = months.map { |mon|
       "[new Date(#{mon[1]}, #{mon[2] - 1}), #{@count_by_month[mon]}, '#{make_tooltip mon[0], @count_by_month[mon]}']"
     }.join ','
     first_mon = Date.civil(months.first[1], months.first[2], 15) << 1
     last_mon = Date.civil(months.last[1], months.last[2], 15)
-    by_month_min = [ first_mon.year, first_mon.mon - 1, first_mon.day ].join ','
-    by_month_max = [ last_mon.year, last_mon.mon - 1, last_mon.day ].join ','
+    report_data['by_month_min'] = [ first_mon.year, first_mon.mon - 1, first_mon.day ].join ','
+    report_data['by_month_max'] = [ last_mon.year, last_mon.mon - 1, last_mon.day ].join ','
 
     by_dow_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -145,6 +171,7 @@ class TweetStats
         "['#{DOWNAMES[dow]}', #{@all_counts[period][:by_dow][dow].to_i}, '#{make_tooltip DOWNAMES[dow], @all_counts[period][:by_dow][dow].to_i}']"
       }.join ','
     }
+    report_data['by_dow_data'] = by_dow_data
 
     by_hour_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -152,6 +179,7 @@ class TweetStats
         "[#{hour}, #{@all_counts[period][:by_hour][hour].to_i}, '#{make_tooltip "Hour #{hour}", @all_counts[period][:by_hour][hour].to_i}']"
       }.join ','
     }
+    report_data['by_hour_data'] = by_hour_data
 
     by_mention_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -161,6 +189,7 @@ class TweetStats
         "[ '@#{user}', #{@all_counts[period][:by_mention][user]} ]"
       }.join ','
     }
+    report_data['by_mention_data'] = by_mention_data
 
     by_source_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -170,6 +199,7 @@ class TweetStats
         "[ '#{source}', #{@all_counts[period][:by_source][source]} ]"
       }.join ','
     }
+    report_data['by_source_data'] = by_source_data
 
     by_words_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -179,14 +209,32 @@ class TweetStats
         "{text: \"#{word}\", weight: #{@all_counts[period][:by_word][word]} }"
       }.join ','
     }
+    report_data['by_words_data'] = by_words_data
 
-    subtitle = "from #{@oldest_tstamp.strftime '%Y-%m-%d'} to #{@newest_tstamp.strftime '%Y-%m-%d'}"
+    report_data['subtitle'] = "from #{@oldest_tstamp.strftime '%Y-%m-%d'} to #{@newest_tstamp.strftime '%Y-%m-%d'}"
 
-    template = ERB.new File.new("#{File.dirname(__FILE__)}/twstat.html.erb").read
-    File.open(outfname, 'w') { |f|
-      f.puts template.result binding
+    report_data.to_json
+  end
+
+  def process_zipfile 
+    Zip::ZipFile.open(@zipfile.path) { |zipf|
+      zipf.file.open('tweets.csv', 'r') { |f|
+
+        # CSV module is different in Ruby 1.8.
+        if CSV.const_defined? :Reader
+          CSV::Reader.parse(f) { |row|
+            process_row row
+          }
+        else
+          CSV.parse(f) { |row|
+            process_row row
+          }
+        end
+      }
     }
 
+    report = gen_report
+    update_status @userid, 'ready', 0, '', report
   end
 end
 
@@ -278,32 +326,44 @@ class TwstatController < ApplicationController
     @uploadtemp.write uploaded_file.read
     @uploadtemp.close
 
-    Zip::ZipFile.open(@uploadtemp.path) { |zipf|
-      @zipentries = zipf.entries
-    }
+    update_status session[:userid], 'busy', 0, ''
 
-    @user = User.find_by_userid(session[:userid])
-    @user.status = {
-      'status' => 'busy',
-      'tweetsDone' => 0,
-      'untilDate' => '',
-    }.to_json
-    @user.save
+    @twstat = TweetStats.new session[:userid], @uploadtemp
+    @twstat.process_zipfile 
 
     redirect_to :action => :dashboard
   end
 
 
   def report
-    @by_month_data = nil
-    @by_month_min = nil
-    @by_month_max = nil
-    @by_dow_data = {}
-    @by_hour_data = {}
-    @by_mention_data = {}
-    @by_source_data = {}
-    @by_words_data = {}
-    @subtitle = ''
+    userid = nil
+    if params[:userid]
+      userid = params[:userid]
+    elsif session[:userid]
+      userid = session[:userid]
+    else
+      redirect_to :action => :index
+      return
+    end
+
+    user = User.find_by_userid userid
+
+    unless user.report
+      redirect_to :action => :dashboard
+      return
+    end
+    report = JSON.parse user.report
+
+    @by_month_data = report['by_month_data']
+    @by_month_min = report['by_month_min']
+    @by_month_max = report['by_month_max']
+    @by_dow_data = report['by_dow_data']
+    @by_hour_data = report['by_hour_data']
+    @by_mention_data = report['by_mention_data']
+    @by_source_data = report['by_source_data']
+    @by_words_data = report['by_words_data']
+    @subtitle = report['subtitle']
+
     render :template => 'twstat/report', :layout => false
   end
 end
