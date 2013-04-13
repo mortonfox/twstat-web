@@ -25,6 +25,7 @@ gem 'jquery-rails'
 gem 'oauth'
 gem 'json'
 
+gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'rubyzip'
 

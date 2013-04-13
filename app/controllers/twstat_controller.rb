@@ -24,7 +24,7 @@ def update_status userid, status, tweetsDone, untilDate, report=nil
   user.save
 end
 
-class TweetStats
+class TweetStats < Struct.new(:userid, :zipfile)
 
   COUNT_DEFS = {
     :alltime => { :title => 'all time', :days => nil, },
@@ -50,10 +50,7 @@ class TweetStats
 
   attr_reader :row_count
 
-  def initialize userid, zipfile
-    @userid = userid
-    @zipfile = zipfile
-
+  def init
     @count_by_month = {}
 
     @all_counts = {}
@@ -87,7 +84,7 @@ class TweetStats
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      update_status @userid, 'busy', @row_count, tstamp
+      update_status userid, 'busy', @row_count, tstamp
     end
 
     # Save the newest timestamp because any last N days stat refers to N
@@ -217,7 +214,7 @@ class TweetStats
   end
 
   def process_zipfile 
-    Zip::ZipFile.open(@zipfile.path) { |zipf|
+    Zip::ZipFile.open(zipfile.path) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
 
         # CSV module is different in Ruby 1.8.
@@ -234,10 +231,14 @@ class TweetStats
     }
 
     report = gen_report
-    update_status @userid, 'ready', 0, '', report
+    update_status userid, 'ready', 0, '', report
+  end
+
+  def perform
+    init
+    process_zipfile
   end
 end
-
 
 class TwstatController < ApplicationController
 
@@ -329,8 +330,8 @@ class TwstatController < ApplicationController
 
     update_status session[:userid], 'busy', 0, ''
 
-    @twstat = TweetStats.new session[:userid], @uploadtemp
-    @twstat.process_zipfile 
+    # Delayed::Job.enqueue TweetStats.new(session[:userid], @uploadtemp)
+    TweetStats.new(session[:userid], @uploadtemp).perform
 
     redirect_to :action => :dashboard
   end
