@@ -37,6 +37,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
+    daemons (1.1.9)
     delayed_job (3.0.5)
       activesupport (~> 3.0)
     delayed_job_active_record (0.4.4)
@@ -58,8 +59,10 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.22)
     multi_json (1.7.2)
+    mysql2 (0.3.11)
     oauth (0.4.7)
     polyglot (0.3.3)
+    psych (2.0.0)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -112,11 +115,14 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
+  daemons
   delayed_job
   delayed_job_active_record
   jquery-rails
   json
+  mysql2
   oauth
+  psych
   rails (= 3.2.12)
   rubyzip
   sass-rails (~> 3.2.3)

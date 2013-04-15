@@ -214,7 +214,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
   end
 
   def process_zipfile 
-    Zip::ZipFile.open(zipfile.path) { |zipf|
+    Zip::ZipFile.open(zipfile) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
 
         # CSV module is different in Ruby 1.8.
@@ -235,8 +235,12 @@ class TweetStats < Struct.new(:userid, :zipfile)
   end
 
   def perform
+    logger.info "================= Running TweetStats::perform..."
     init
     process_zipfile
+  rescue Exception => e
+    logger.error "Error in TweetStats::perform: #{e}"
+    logger.error e.backtrace.join("\n")
   end
 end
 
@@ -308,12 +312,20 @@ class TwstatController < ApplicationController
     @userid = session[:userid]
     @user = User.find_by_userid @userid
 
+    unless @user
+      # No user record? Let user log in again.
+      session[:userid] = nil
+      session[:username] = nil
+      redirect_to :action => :index
+      return
+    end
+
     @user_status = if @user.status
                      JSON.parse @user.status
                    else
                      { 'status' => 'ready', 'tweetsDone' => 0, 'untilDate' => '' }
                    end
-    $stderr.puts @user_status
+    logger.info @user_status.to_s
     @do_refresh = @user_status['status'] == 'busy'
   end
 
@@ -330,8 +342,10 @@ class TwstatController < ApplicationController
 
     update_status session[:userid], 'busy', 0, ''
 
-    # Delayed::Job.enqueue TweetStats.new(session[:userid], @uploadtemp)
-    TweetStats.new(session[:userid], @uploadtemp).perform
+    # Delayed::Job.enqueue TweetStats.new(session[:userid], @uploadtemp.path)
+    # TweetStats.new(session[:userid], @uploadtemp.path).perform
+    # Delayed::Worker.destroy_failed_jobs = false
+    TweetStats.new(session[:userid], @uploadtemp.path).delay.perform
 
     redirect_to :action => :dashboard
   end

@@ -6,6 +6,7 @@ gem 'rails', '3.2.12'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
+# gem 'mysql2'
 
 
 # Gems used only for assets and not required
@@ -27,7 +28,10 @@ gem 'json'
 
 gem 'delayed_job'
 gem 'delayed_job_active_record'
+gem 'daemons'
 gem 'rubyzip'
+
+gem 'psych'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
