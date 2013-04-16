@@ -233,14 +233,14 @@ class TweetStats < Struct.new(:userid, :zipfile)
     self.class.update_status userid, 'ready', 0, '', report
   end
 
-  def perform
-    Rails.logger.info "Running TweetStats::perform..."
+  def run
+    Rails.logger.info "Running TweetStats::run... (user: #{userid} file: #{zipfile})"
     init
     process_zipfile
+    Rails.logger.info "Finished TweetStats::run. (user: #{userid} file: #{zipfile})"
   rescue Exception => e
-    Rails.logger.error "Error in TweetStats::perform: #{e}"
+    Rails.logger.error "Error in TweetStats::run: #{e}"
     Rails.logger.error e.backtrace.join("\n")
   end
 end
-
 

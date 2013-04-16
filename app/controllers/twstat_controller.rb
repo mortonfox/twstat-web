@@ -98,11 +98,7 @@ class TwstatController < ApplicationController
     @uploadtemp.close
 
     TweetStats::update_status session[:userid], 'busy', 0, ''
-    TweetStats.new(session[:userid], @uploadtemp.path).delay.perform
-
-    # Delayed::Job.enqueue TweetStats.new(session[:userid], @uploadtemp.path)
-    # TweetStats.new(session[:userid], @uploadtemp.path).perform
-    # TweetStats.new(session[:userid], @uploadtemp.path).delay.perform
+    TweetStats.new(session[:userid], @uploadtemp.path).delay.run
 
     redirect_to :action => :dashboard
   end
