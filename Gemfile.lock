@@ -61,7 +61,6 @@ GEM
     multi_json (1.7.2)
     oauth (0.4.7)
     polyglot (0.3.3)
-    psych (2.0.0)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -120,7 +119,6 @@ DEPENDENCIES
   jquery-rails
   json
   oauth
-  psych
   rails (= 3.2.12)
   rubyzip
   sass-rails (~> 3.2.3)
