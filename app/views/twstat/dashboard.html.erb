@@ -6,13 +6,23 @@
 <% when 'busy' %>
 
   <p>
-  Processing Twitter archive... <br />
-  <%= @user_status['tweetsDone'] %> tweets back to 
-  <%= @user_status['untilDate'] %>
+  <% if @cancel %>
+    Canceling...
+  <% else %>
+    Processing Twitter archive... <br />
+    <%= @user_status['tweetsDone'] %> tweets back to 
+    <%= @user_status['untilDate'] %>
+    <%= render :partial => 'cancelbutton' %>
+  <% end %>
 
 <% when 'waiting' %>
   <p>
-  Queued...
+  <% if @cancel %>
+    Canceling...
+  <% else %>
+    Queued...
+    <%= render :partial => 'cancelbutton' %>
+  <% end %>
 
 <% else %>  
 

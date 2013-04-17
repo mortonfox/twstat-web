@@ -1,6 +1,9 @@
 require 'csv'
 require 'zip/zipfilesystem'
 
+class CanceledException < RuntimeError
+end
+
 class TweetStats < Struct.new(:userid, :zipfile)
 
   def self.update_status userid, status, tweetsDone, untilDate, report=nil
@@ -18,12 +21,18 @@ class TweetStats < Struct.new(:userid, :zipfile)
       'untilDate' => datestr,
     }.to_json
 
+    if status == 'waiting'
+      # All new jobs start in non-cancel state.
+      user.cancel = false
+    end
+
     if report
       user.report = report
       user.last_generated = Time.now
     end
 
     user.save
+    user
   end
 
   COUNT_DEFS = {
@@ -84,7 +93,11 @@ class TweetStats < Struct.new(:userid, :zipfile)
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      self.class.update_status userid, 'busy', @row_count, tstamp
+      user = self.class.update_status userid, 'busy', @row_count, tstamp
+      if user.cancel
+        self.class.update_status userid, 'ready', 0, ''
+        raise CanceledException
+      end
     end
 
     # Save the newest timestamp because any last N days stat refers to N
@@ -239,6 +252,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
     init
     process_zipfile
     Rails.logger.info "Finished TweetStats::run. (user: #{userid} file: #{zipfile})"
+  rescue CanceledException
+    Rails.logger.info "Canceled TweetStats::run. (user: #{userid} file: #{zipfile})"
   rescue Exception => e
     Rails.logger.error "Error in TweetStats::run: #{e}"
     Rails.logger.error e.backtrace.join("\n")

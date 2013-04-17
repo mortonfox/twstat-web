@@ -84,6 +84,7 @@ class TwstatController < ApplicationController
                    end
 
     @last_generated = @user.last_generated
+    @cancel = @user.cancel
     logger.info @user_status.to_s
     @do_refresh = (@user_status['status'] == 'busy' || @user_status['status'] == 'waiting')
   end
@@ -105,6 +106,26 @@ class TwstatController < ApplicationController
     redirect_to :action => :dashboard
   end
 
+  def cancel
+    unless session[:userid]
+      redirect_to :action => :index
+      return
+    end
+
+    @userid = session[:userid]
+
+    if Delayed::Job.where('handler like "%TweetStats%" and failed_at is null').empty?
+      TweetStats::update_status session[:userid], 'ready', 0, ''
+    else
+      user = User.find_by_userid session[:userid]
+      if user
+        user.cancel = true
+        user.save
+      end
+    end
+
+    redirect_to :action => :dashboard
+  end
 
   def report
     userid = nil

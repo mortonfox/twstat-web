@@ -6,6 +6,7 @@ TwstatWeb::Application.routes.draw do
   get 'twstat/dashboard'
   get 'twstat/report'
   post 'twstat/upload'
+  post 'twstat/cancel'
 
   get 'twstat' => 'twstat#index'
   root :to => 'twstat#index'
