@@ -89,7 +89,7 @@ class TwstatController < ApplicationController
       @last_generated = Time.at report['last_generated']
     end
     logger.info @user_status.to_s
-    @do_refresh = @user_status['status'] == 'busy'
+    @do_refresh = (@user_status['status'] == 'busy' || @user_status['status'] == 'waiting')
   end
 
   def upload
@@ -103,7 +103,7 @@ class TwstatController < ApplicationController
     @uploadtemp.write uploaded_file.read
     @uploadtemp.close
 
-    TweetStats::update_status session[:userid], 'busy', 0, ''
+    TweetStats::update_status session[:userid], 'waiting', 0, ''
     TweetStats.new(session[:userid], @uploadtemp.path).delay.run
 
     redirect_to :action => :dashboard

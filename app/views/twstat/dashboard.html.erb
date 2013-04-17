@@ -2,12 +2,17 @@
 
 <p>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</p>
 
-<% if @user_status['status'] == 'busy' %>
+<% case @user_status['status'] %>
+<% when 'busy' %>
 
   <p>
   Processing Twitter archive... <br />
   <%= @user_status['tweetsDone'] %> tweets back to 
   <%= @user_status['untilDate'] %>
+
+<% when 'waiting' %>
+  <p>
+  Queued...
 
 <% else %>  
 
