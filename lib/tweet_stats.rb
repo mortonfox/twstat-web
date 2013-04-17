@@ -20,6 +20,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
 
     if report
       user.report = report
+      user.last_generated = Time.now
     end
 
     user.save
@@ -208,8 +209,6 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_words_data'] = by_words_data
 
     report_data['subtitle'] = "from #{@oldest_tstamp.strftime '%Y-%m-%d'} to #{@newest_tstamp.strftime '%Y-%m-%d'}"
-
-    report_data['last_generated'] = Time.now.to_i
 
     report_data.to_json
   end

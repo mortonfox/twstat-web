@@ -5,6 +5,8 @@ class CreateUsers < ActiveRecord::Migration
       t.string :username
       t.text :status
       t.text :report
+      t.timestamp :last_generated
+      t.boolean :cancel
 
       t.timestamps
     end

@@ -34,8 +34,10 @@ ActiveRecord::Schema.define(:version => 20130403204851) do
     t.string   "username"
     t.text     "status"
     t.text     "report"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "last_generated"
+    t.boolean  "cancel"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   add_index "users", ["userid"], :name => "index_users_on_userid", :unique => true

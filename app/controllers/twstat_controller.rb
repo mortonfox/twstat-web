@@ -83,11 +83,7 @@ class TwstatController < ApplicationController
                      { 'status' => 'ready', 'tweetsDone' => 0, 'untilDate' => '' }
                    end
 
-    @last_generated = nil
-    if @user.report
-      report = JSON.parse @user.report
-      @last_generated = Time.at report['last_generated']
-    end
+    @last_generated = @user.last_generated
     logger.info @user_status.to_s
     @do_refresh = (@user_status['status'] == 'busy' || @user_status['status'] == 'waiting')
   end
