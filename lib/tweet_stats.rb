@@ -95,6 +95,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     if @row_count % PROGRESS_INTERVAL == 0
       user = self.class.update_status userid, 'busy', @row_count, tstamp
       if user.cancel
+        # User requested job cancel.
         self.class.update_status userid, 'ready', 0, ''
         raise CanceledException
       end

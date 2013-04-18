@@ -61,12 +61,12 @@ class TwstatController < ApplicationController
   end
 
   def dashboard
-    unless session[:userid]
+    @userid = session[:userid]
+    unless @userid
       redirect_to :action => :index
       return
     end
 
-    @userid = session[:userid]
     @user = User.find_by_userid @userid
 
     unless @user
@@ -90,7 +90,8 @@ class TwstatController < ApplicationController
   end
 
   def upload
-    unless session[:userid]
+    @userid = session[:userid]
+    unless @userid
       redirect_to :action => :index
       return
     end
@@ -100,30 +101,38 @@ class TwstatController < ApplicationController
     @uploadtemp.write uploaded_file.read
     @uploadtemp.close
 
-    TweetStats::update_status session[:userid], 'waiting', 0, ''
-    TweetStats.new(session[:userid], @uploadtemp.path).delay.run
+    TweetStats::update_status @userid, 'waiting', 0, ''
+    TweetStats.new(@userid, @uploadtemp.path).delay.run
 
     redirect_to :action => :dashboard
   end
 
   def cancel
-    unless session[:userid]
+    @userid = session[:userid]
+    unless @userid
       redirect_to :action => :index
       return
     end
 
-    @userid = session[:userid]
-
-    if Delayed::Job.where('handler like "%TweetStats%" and failed_at is null').empty?
-      TweetStats::update_status session[:userid], 'ready', 0, ''
-    else
-      user = User.find_by_userid session[:userid]
-      if user
-        user.cancel = true
-        user.save
+    Delayed::Job.all.each { |job|
+      if job.name =~ /^TweetStats/ and job.payload_object.userid == @userid and not job.failed?
+        if job.locked_at
+          user = User.find_by_userid @userid
+          if user
+            user.cancel = true
+            user.save
+            # Already running. Wait for job to cancel itself.
+            redirect_to :action => :dashboard
+            return
+          end
+        else
+          job.destroy
+        end
       end
-    end
+    }
 
+    # No job running for this user. We can simply reset the status.
+    TweetStats::update_status @userid, 'ready', 0, ''
     redirect_to :action => :dashboard
   end
 
