@@ -1,6 +1,6 @@
 # twstat-web - Online Twitter stats generator
 
-    Warning: This software package is still under very early development. If you use it, be prepared to wipe it out and reinstall from scratch because of incompatible design changes.
+> Warning: This software package is still under very early development. If you use it, be prepared to wipe it out and reinstall from scratch because of incompatible design changes.
 
 ## Introduction
 
