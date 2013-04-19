@@ -39,8 +39,11 @@
   <% end %>
 
   <%= form_tag({ :action => :upload }, :multipart => true) do %>
-    tweets.zip file: <%= file_field_tag :tweetdata %>
-    <%= submit_tag('Upload') %>
+    <%= field_set_tag do %>
+      Upload tweets.zip file:<br />
+      <%= file_field_tag :tweetdata %>
+      <%= submit_tag('Upload') %>
+    <% end %>
   <% end %>
 
 <% end %>
