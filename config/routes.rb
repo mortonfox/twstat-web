@@ -5,6 +5,7 @@ TwstatWeb::Application.routes.draw do
   get 'twstat/oauth'
   get 'twstat/dashboard'
   get 'twstat/report'
+  get 'twstat/about'
   post 'twstat/upload'
   post 'twstat/cancel'
 

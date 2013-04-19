@@ -1,4 +1,4 @@
-<h1>Twstat#dashboard</h1>
+<h1>Twitter Archive Stats - Dashboard</h1>
 
 <p>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</p>
 
@@ -45,4 +45,5 @@
 
 <% end %>
 
-<p><%= link_to 'Logout', :action => :logout %>
+<p><%= link_to 'Logout', :action => :logout %> | <%= link_to 'Help/About', :action => :about %></p>
+

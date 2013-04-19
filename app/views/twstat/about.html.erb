@@ -1,0 +1,27 @@
+<h1>Twitter Archive Stats - About</h1>
+
+<p>This is a webapp that generates a page of charts from a Twitter archive. Source code is available at GitHub: <a href="https://github.com/mortonfox/twstat-web">https://github.com/mortonfox/twstat-web</a></p>
+
+<p>In December 2012, Twitter <a href="http://blog.twitter.com/2012/12/your-twitter-archive.html">introduced</a> a feature allowing users to download an archive of their entire user timeline. By February 2013, it was available to all users. </p>
+
+<p>To request your Twitter archive:</p>
+
+<ol>
+<li>Visit <a href="https://twitter.com/settings/account">https://twitter.com/settings/account</a></li>
+<li>Click on the &quot;Request your archive&quot; button.</li>
+<li>Wait for an email from Twitter with a download link.</li>
+</ol>
+
+<p>Then upload the tweets.zip file to this webapp to generate the charts.</p>
+
+<p>
+<%= 
+  action = if @userid
+             :dashboard
+           else
+             :index
+           end
+  link_to 'Back', :action => action
+%>
+</p>
+

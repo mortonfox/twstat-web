@@ -12,6 +12,7 @@ class TwstatController < ApplicationController
   end
 
   def index
+    @title = 'Log in'
     if session[:userid]
       redirect_to :action => :dashboard
       return
@@ -61,6 +62,8 @@ class TwstatController < ApplicationController
   end
 
   def dashboard
+    @title = 'Dashboard'
+
     @userid = session[:userid]
     unless @userid
       redirect_to :action => :index
@@ -107,6 +110,11 @@ class TwstatController < ApplicationController
     redirect_to :action => :dashboard
   end
 
+  def about
+    @title = 'About'
+    @userid = session[:userid]
+  end
+
   def cancel
     @userid = session[:userid]
     unless @userid
@@ -137,6 +145,8 @@ class TwstatController < ApplicationController
   end
 
   def report
+    @title = 'Report'
+
     userid = nil
     if params[:userid]
       userid = params[:userid]
