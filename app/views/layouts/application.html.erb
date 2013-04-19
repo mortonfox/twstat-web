@@ -10,13 +10,27 @@
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 
+  <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+  <style type="text/css">
+    fieldset {
+      border: 1px solid #bbb;
+    }
+  </style>  
+
   <% if @do_refresh %>
     <meta http-equiv="refresh" content="2" />
   <% end %>
 </head>
 <body>
 
-<%= yield %>
+  <div class="container">
+    <%= yield %>
+  </div>
+
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>

@@ -1,6 +1,8 @@
+<div class="page-header">
 <h1>Twitter Archive Stats - Dashboard</h1>
+</div>
 
-<p>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</p>
+<p><small>Logged in as <%=h session[:username] %> (<%=h session[:userid] %>)</small></p>
 
 <% case @user_status['status'] %>
 <% when 'busy' %>
@@ -32,21 +34,32 @@
 
   <p>
   <% if @last_generated %>
-    <%= link_to 'View report', :action => :report, :userid => @userid %><br />
-    (Last report run: <%= @last_generated.strftime '%Y-%m-%d %H:%M' %>)
+    <%= link_to 'View report', { :action => :report, :userid => @userid }, :class => 'btn' %><br />
+    <small>(Last report run: <%= @last_generated.strftime '%Y-%m-%d %H:%M' %>)</small>
   <% else %>
     No saved report.
   <% end %>
+  </p>
 
-  <%= form_tag({ :action => :upload }, :multipart => true) do %>
-    <%= field_set_tag do %>
-      Upload tweets.zip file:<br />
-      <%= file_field_tag :tweetdata %>
-      <%= submit_tag('Upload') %>
-    <% end %>
+  <%= form_tag({ :action => :upload }, :class => 'form-horizontal', :multipart => true) do %>
+    <fieldset>
+      <div class="control-group">
+        <%= label_tag :tweetdata, 'Upload tweets.zip file:', :class => 'control-label' %>
+        <div class="controls">
+          <%= file_field_tag :tweetdata %>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </div>
+    </fieldset>
   <% end %>
 
 <% end %>
 
+<hr>
+<footer>
 <p><%= link_to 'Logout', :action => :logout %> | <%= link_to 'Help/About', :action => :about %></p>
-
+</footer>

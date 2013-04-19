@@ -1,4 +1,6 @@
+<div class="page-header">
 <h1>Twitter Archive Stats - About</h1>
+</div>
 
 <p>This is a webapp that generates a page of charts from a Twitter archive. Source code is available at GitHub: <a href="https://github.com/mortonfox/twstat-web">https://github.com/mortonfox/twstat-web</a></p>
 
@@ -14,6 +16,8 @@
 
 <p>Then upload the tweets.zip file to this webapp to generate the charts.</p>
 
+<hr>
+<footer>
 <p>
 <%= 
   action = if @userid
@@ -24,4 +28,4 @@
   link_to 'Back', :action => action
 %>
 </p>
-
+</footer>
