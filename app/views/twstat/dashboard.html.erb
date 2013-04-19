@@ -44,10 +44,14 @@
   <%= form_tag({ :action => :upload }, :class => 'form-horizontal', :multipart => true) do %>
     <fieldset>
       <div class="control-group">
-        <%= label_tag :tweetdata, 'Upload tweets.zip file:', :class => 'control-label' %>
-        <div class="controls">
-          <%= file_field_tag :tweetdata %>
+        <%= label_tag :tweetdata, 'Upload tweets.zip file: ', :class => 'control-label' %>
+
+        <div class="fileupload fileupload-new" data-provides="fileupload">
+          <span class="btn btn-file"><span class="fileupload-new">Select file</span><span class="fileupload-exists">Change</span><input type="file" id="tweetdata" name="tweetdata" /></span>
+          <span class="fileupload-preview"></span>
+          <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
         </div>
+
       </div>
       <div class="control-group">
         <div class="controls">
