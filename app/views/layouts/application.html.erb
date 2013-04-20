@@ -8,18 +8,12 @@
       (<%= @title %>)
     <% end %>
   </title>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 
   <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <link href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/2.3.0-j5/jasny-bootstrap.min.css" rel="stylesheet" media="screen">
-
-  <style type="text/css">
-    fieldset {
-      border: 1px solid #bbb;
-    }
-  </style>  
+  <%= stylesheet_link_tag    "application", :media => "all" %>
 
   <% if @do_refresh %>
     <meta http-equiv="refresh" content="2" />

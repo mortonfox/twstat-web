@@ -3,3 +3,16 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .error { color: #ff0000; }
+
+fieldset {
+    border: 1px solid #bbb;
+    padding: 2em;
+}
+
+form button.btn {
+    margin-top: 1em;
+}
+
+form {
+    margin: 2em 0 2em 0;
+}
