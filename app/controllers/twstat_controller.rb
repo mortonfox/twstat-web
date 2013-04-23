@@ -3,8 +3,13 @@ require 'tweet_stats'
 
 class TwstatController < ApplicationController
 
-  CONSUMER_KEY = 'kENAx1tEBxoalX9e7dMuw'
-  CONSUMER_SECRET = 'A7XNOF3XWpyAdILj0k5IPuUWeCwV6AKiEvzkFuPFE'
+  if Rails.env.production?
+    CONSUMER_KEY = 'tFEZlDcdxlgSkoJzKcOcQ'
+    CONSUMER_SECRET = 'DQDMaIpoE2iUmCXaeNNtm5fBCahCuXLqeK8NWksqZTM'
+  else
+    CONSUMER_KEY = 'kENAx1tEBxoalX9e7dMuw'
+    CONSUMER_SECRET = 'A7XNOF3XWpyAdILj0k5IPuUWeCwV6AKiEvzkFuPFE'
+  end
 
   def initialize
     super
