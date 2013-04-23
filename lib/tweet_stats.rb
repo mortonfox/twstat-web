@@ -1,5 +1,6 @@
 require 'csv'
 require 'zip/zipfilesystem'
+require 'tempfile'
 
 class CanceledException < RuntimeError
 end
@@ -231,16 +232,22 @@ class TweetStats < Struct.new(:userid, :zipfile)
     Zip::ZipFile.open(zipfile) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
 
+        tempfile = Tempfile.new ['tweetdata', '.csv'], :encoding => 'ascii-8bit'
+        tempfile.write f.read
+        tempfile.rewind
+
         # CSV module is different in Ruby 1.8.
         if CSV.const_defined? :Reader
-          CSV::Reader.parse(f) { |row|
+          CSV::Reader.parse(tempfile) { |row|
             process_row row
           }
         else
-          CSV.parse(f) { |row|
+          CSV.parse(tempfile) { |row|
             process_row row
           }
         end
+
+        tempfile.close
       }
     }
 
@@ -268,7 +275,6 @@ class TweetStats < Struct.new(:userid, :zipfile)
       'errorMsg' => errormsg,
     }.to_json
     user.save
-    user
   end
 end
 
