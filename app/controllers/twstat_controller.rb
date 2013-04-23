@@ -6,9 +6,11 @@ class TwstatController < ApplicationController
   if Rails.env.production?
     CONSUMER_KEY = 'tFEZlDcdxlgSkoJzKcOcQ'
     CONSUMER_SECRET = 'DQDMaIpoE2iUmCXaeNNtm5fBCahCuXLqeK8NWksqZTM'
+    CALLBACK_URL = 'http://qslv.com/twstat/oauth'
   else
     CONSUMER_KEY = 'kENAx1tEBxoalX9e7dMuw'
     CONSUMER_SECRET = 'A7XNOF3XWpyAdILj0k5IPuUWeCwV6AKiEvzkFuPFE'
+    CALLBACK_URL = 'http://127.0.0.1:3000/twstat/oauth'
   end
 
   def initialize
@@ -27,7 +29,7 @@ class TwstatController < ApplicationController
   def login
     oauth = OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET,
                                 { :site => "https://api.twitter.com" })
-    callback_url = 'http://127.0.0.1:3000/twstat/oauth'
+    callback_url = CALLBACK_URL
     request_token = oauth.get_request_token(:oauth_callback => callback_url)
 
     session[:request_token] = request_token.token
