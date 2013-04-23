@@ -256,8 +256,19 @@ class TweetStats < Struct.new(:userid, :zipfile)
   rescue CanceledException
     Rails.logger.info "Canceled TweetStats::run. (user: #{userid} file: #{zipfile})"
   rescue Exception => e
-    Rails.logger.error "Error in TweetStats::run: #{e}"
+    errormsg = "Error in TweetStats::run: #{e}"
+    Rails.logger.error errormsg
     Rails.logger.error e.backtrace.join("\n")
+
+    user = User.find_by_userid userid
+    user.status = {
+      'status' => 'error',
+      'tweetsDone' => 0,
+      'untilDate' => '',
+      'errorMsg' => errormsg,
+    }.to_json
+    user.save
+    user
   end
 end
 
