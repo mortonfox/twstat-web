@@ -232,6 +232,9 @@ class TweetStats < Struct.new(:userid, :zipfile)
     Zip::ZipFile.open(zipfile) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
 
+        # Save tweets.csv to tempfile because Ruby 1.9 CSV needs to be able
+        # to move the file pointer in the IO Stream. Ruby 2.0 CSV got rid
+        # of that requirement.
         tempfile = Tempfile.new ['tweetdata', '.csv'], :encoding => 'ascii-8bit'
         tempfile.write f.read
         tempfile.rewind

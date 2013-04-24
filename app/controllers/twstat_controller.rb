@@ -85,6 +85,13 @@ class TwstatController < ApplicationController
                      { 'status' => 'ready', 'tweetsDone' => 0, 'untilDate' => '' }
                    end
 
+    @error_msg = nil
+    if @user_status['status'] == 'error'
+      # Grab the error message for display and clear the error.
+      @error_msg = @user_status['errorMsg']
+      TweetStats::update_status @userid, 'ready', 0, ''
+    end
+
     @last_generated = @user.last_generated
     @cancel = @user.cancel
     logger.info @user_status.to_s

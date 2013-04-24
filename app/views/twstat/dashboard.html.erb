@@ -28,9 +28,11 @@
 
 <% else %>  
 
-  <% if @user_status['status'] == 'error' %>
-    <p class="text-error"><%= @user_status['errorMsg'] %></p>
-  <% end %>
+  <div class="text-error">
+    <% if @error_msg %>
+      Error: <%= @error_msg %>
+    <% end %>
+  </div>
 
   <p>
   <% if @last_generated %>
