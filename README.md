@@ -1,6 +1,6 @@
 # twstat-web - Online Twitter stats generator
 
-> Warning: This software package is still under very early development. If you use it, be prepared to wipe it out and reinstall from scratch because of incompatible design changes.
+> Warning: This software package is still under development. If you use it, be prepared to wipe it out and reinstall from scratch because of incompatible design changes.
 
 ## Introduction
 
@@ -13,7 +13,7 @@ In December 2012, Twitter [introduced](http://blog.twitter.com/2012/12/your-twit
 To request your Twitter archive:
 
 1. Visit https://twitter.com/settings/account
-1. Click on the "Request your archive" button.
+1. Click on the "Request your archive" button. (near the bottom of the settings page)
 1. Wait for an email from Twitter with a download link.
 
 
@@ -29,3 +29,6 @@ Run the following in the root of the file tree:
 * `RAILS_ENV=production script/delayed_job start`
 * `rails server -e production`
 
+## Demo
+
+There is a live demo at http://qslv.com/twstat
