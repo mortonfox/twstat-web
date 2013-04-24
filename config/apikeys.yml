@@ -1,0 +1,14 @@
+# Add your Twitter API keys here. You can have different keys for
+# development and production environments.
+#
+
+development:
+    consumer_key: kENAx1tEBxoalX9e7dMuw
+    consumer_secret: A7XNOF3XWpyAdILj0k5IPuUWeCwV6AKiEvzkFuPFE
+    callback_url: http://127.0.0.1:3000/twstat/oauth
+
+production:
+    consumer_key: tFEZlDcdxlgSkoJzKcOcQ
+    consumer_secret: DQDMaIpoE2iUmCXaeNNtm5fBCahCuXLqeK8NWksqZTM
+    callback_url: http://qslv.com/twstat/oauth
+
