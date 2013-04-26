@@ -89,7 +89,7 @@ class TwstatController < ApplicationController
     if @user_status['status'] == 'error'
       # Grab the error message for display and clear the error.
       @error_msg = @user_status['errorMsg']
-      TweetStats::update_status @userid, 'ready', 0, ''
+      User.update_status :userid => @userid, :status => 'ready'
     end
 
     @last_generated = @user.last_generated
@@ -106,12 +106,19 @@ class TwstatController < ApplicationController
     end
 
     uploaded_file = params[:tweetdata]
-    @uploadtemp = Tempfile.new ['tweetdata', '.zip'], :encoding => 'ascii-8bit'
-    @uploadtemp.write uploaded_file.read
-    @uploadtemp.close
 
-    TweetStats::update_status @userid, 'waiting', 0, ''
-    TweetStats.new(@userid, @uploadtemp.path).delay.run
+    if uploaded_file
+
+      @uploadtemp = Tempfile.new ['tweetdata', '.zip'], :encoding => 'ascii-8bit'
+      @uploadtemp.write uploaded_file.read
+      @uploadtemp.close
+
+      User.update_status :userid => @userid, :status => 'waiting'
+      TweetStats.new(@userid, @uploadtemp.path).delay.run
+
+    else
+      flash[:formError] = 'Please select a file to upload.'
+    end
 
     redirect_to :action => :dashboard
   end
@@ -146,7 +153,7 @@ class TwstatController < ApplicationController
     }
 
     # No job running for this user. We can simply reset the status.
-    TweetStats::update_status @userid, 'ready', 0, ''
+    User.update_status :userid => @userid, :status => 'ready'
     redirect_to :action => :dashboard
   end
 

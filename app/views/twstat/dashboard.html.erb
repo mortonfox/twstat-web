@@ -45,6 +45,12 @@
 
   <%= form_tag({ :action => :upload }, :class => 'form-inline', :multipart => true) do %>
     <fieldset>
+      <% if flash[:formError] %>
+        <div class="text-error">
+          <%= flash[:formError] %>
+        </div>
+      <% end %>
+
       <%= label_tag :tweetdata, 'Upload tweets.zip file: ' %>
 
       <div class="fileupload fileupload-new" data-provides="fileupload">

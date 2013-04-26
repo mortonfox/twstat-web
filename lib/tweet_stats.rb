@@ -7,35 +7,6 @@ end
 
 class TweetStats < Struct.new(:userid, :zipfile)
 
-  def self.update_status userid, status, tweetsDone, untilDate, report=nil
-    datestr = case untilDate
-              when Time
-                untilDate.strftime '%Y-%m-%d'
-              else
-                untilDate
-              end
-
-    user = User.find_by_userid userid
-    user.status = {
-      'status' => status,
-      'tweetsDone' => tweetsDone,
-      'untilDate' => datestr,
-    }.to_json
-
-    if status == 'waiting'
-      # All new jobs start in non-cancel state.
-      user.cancel = false
-    end
-
-    if report
-      user.report = report
-      user.last_generated = Time.now
-    end
-
-    user.save
-    user
-  end
-
   COUNT_DEFS = {
     :alltime => { :title => 'all time', :days => nil, },
     :last30 => { :title => 'last 30 days', :days => 30, },
@@ -94,10 +65,10 @@ class TweetStats < Struct.new(:userid, :zipfile)
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      user = self.class.update_status userid, 'busy', @row_count, tstamp
+      user = User.update_status :userid => userid, :status => 'busy', :tweetsDone => @row_count, :untilDate => tstamp
       if user.cancel
         # User requested job cancel.
-        self.class.update_status userid, 'ready', 0, ''
+        User.update_status :userid => userid, :status => 'ready'
         raise CanceledException
       end
     end
@@ -255,7 +226,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     }
 
     report = gen_report
-    self.class.update_status userid, 'ready', 0, '', report
+    User.update_status :userid => userid, :status => 'ready', :report => report
   end
 
   def run
@@ -270,14 +241,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     Rails.logger.error errormsg
     Rails.logger.error e.backtrace.join("\n")
 
-    user = User.find_by_userid userid
-    user.status = {
-      'status' => 'error',
-      'tweetsDone' => 0,
-      'untilDate' => '',
-      'errorMsg' => errormsg,
-    }.to_json
-    user.save
+    User.update_status :userid => userid, :status => 'error', :errorMsg => errormsg
   end
 end
 
