@@ -94,7 +94,6 @@ class TwstatController < ApplicationController
 
     @last_generated = @user.last_generated
     @cancel = @user.cancel
-    logger.info @user_status.to_s
     @do_refresh = (@user_status['status'] == 'busy' || @user_status['status'] == 'waiting')
   end
 
