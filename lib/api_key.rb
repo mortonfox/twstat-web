@@ -17,8 +17,8 @@ class ApiKey
       raise "No #{field} for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey[field]
 
       # Define an accessor for each API key field.
-      self.class.send(:define_method, field) {
-        @apikey[field]
+      class_eval {
+        define_method(field) { @apikey[field] }
       }
 
     }
