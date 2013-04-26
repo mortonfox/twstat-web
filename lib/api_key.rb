@@ -1,24 +1,26 @@
 class ApiKey
   APIKEYS_FNAME = 'apikeys.yml'
 
+  APIKEY_FIELDS = [
+    'consumer_key', 
+    'consumer_secret', 
+    'callback_url' 
+  ]
+
   def initialize
     @apikey = YAML::load(Rails.root.join('config', APIKEYS_FNAME).open)[Rails.env]
     raise "No API key for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey
-    raise "No consumer key for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey['consumer_key']
-    raise "No consumer secret for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey['consumer_secret']
-    raise "No callback URL for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey['callback_url']
-  end
 
-  def consumer_key
-    @apikey['consumer_key']
-  end
+    APIKEY_FIELDS.each { |field|
 
-  def consumer_secret
-    @apikey['consumer_secret']
-  end
+      # Verify that the API key field exists.
+      raise "No #{field} for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey[field]
 
-  def callback_url
-    @apikey['callback_url']
-  end
+      # Define an accessor for each API key field.
+      self.class.send(:define_method, field) {
+        @apikey[field]
+      }
 
+    }
+  end
 end
