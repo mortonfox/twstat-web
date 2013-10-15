@@ -1,27 +1,28 @@
+# user record in database.
 class User < ActiveRecord::Base
   attr_accessible :report, :status, :userid, :username
 
   def self.update_status params = {}
     userid     = params[:userid] or fail 'Error in User::update_status: userid not specified'
     status     = params[:status] || 'ready'
-    tweetsDone = params[:tweetsDone] || 0
-    untilDate  = params[:untilDate] || ''
+    tweets_done = params[:tweets_done] || 0
+    until_date  = params[:until_date] || ''
     report     = params[:report]
-    errorMsg   = params[:errorMsg]
+    error_msg   = params[:error_msg]
 
-    datestr = case untilDate
+    datestr = case until_date
               when Time
-                untilDate.strftime '%Y-%m-%d'
+                until_date.strftime '%Y-%m-%d'
               else
-                untilDate
+                until_date
               end
 
     user = find_by_userid userid
     user.status = {
       'status'     => status,
-      'tweetsDone' => tweetsDone,
+      'tweetsDone' => tweets_done,
       'untilDate'  => datestr,
-      'errorMsg'   => errorMsg,
+      'errorMsg'   => error_msg,
     }.to_json
 
     if status == 'waiting'

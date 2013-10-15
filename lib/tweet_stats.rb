@@ -5,6 +5,7 @@ require 'tempfile'
 class CanceledException < RuntimeError
 end
 
+# Process tweet stats from a tweets.zip file.
 class TweetStats < Struct.new(:userid, :zipfile)
 
   COUNT_DEFS = {
@@ -16,17 +17,17 @@ class TweetStats < Struct.new(:userid, :zipfile)
   STRIP_A_TAG = /<a[^>]*>(.*)<\/a>/
 
   COMMON_WORDS = %w{
-    the and you that 
+    the and you that
     was for are with his they
     this have from one had word
     but not what all were when your can said
-    there use each which she how their 
-    will other about out many then them these 
+    there use each which she how their
+    will other about out many then them these
     some her would make like him into time has look
     two more write see number way could people
     than first water been call who oil its now
     find long down day did get come made may part
-    http com net org www https 
+    http com net org www https
   }
 
   attr_reader :row_count
@@ -61,15 +62,15 @@ class TweetStats < Struct.new(:userid, :zipfile)
     # Skip malformed/short rows.
     return if row.size < 8
 
-    _, _, _, _, _, tstamp_str, source_str, tweet_str, _ = row
+    _, _, _, tstamp_str, source_str, tweet_str, _, _, _, _ = row
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      user = User.update_status :userid => userid, :status => 'busy', :tweetsDone => @row_count, :untilDate => tstamp
+      user = User.update_status :userid => userid, :status => 'busy', :tweets_done => @row_count, :until_date => tstamp
       if user.cancel
         # User requested job cancel.
         User.update_status :userid => userid, :status => 'ready'
-        raise CanceledException
+        fail CanceledException
       end
     end
 
@@ -87,7 +88,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     # This assumes that tweets.csv is ordered from newest to oldest.
     @oldest_tstamp = tstamp
 
-    mon_key = [ "%04d-%02d" % [ tstamp.year, tstamp.mon ], tstamp.year, tstamp.mon ]
+    mon_key = [sprintf('%04d-%02d', tstamp.year, tstamp.mon), tstamp.year, tstamp.mon]
     @count_by_month[mon_key] ||= 0
     @count_by_month[mon_key] += 1
 
@@ -95,9 +96,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     source = source_str.gsub(STRIP_A_TAG, '\1')
 
     # This is for Ruby 1.9 when reading from ZIP file.
-    if tweet_str.respond_to? :force_encoding
-      tweet_str.force_encoding 'utf-8'
-    end
+    tweet_str.force_encoding 'utf-8' if tweet_str.respond_to? :force_encoding
 
     # The gsub() converts Unicode right single quotes to ASCII single quotes.
     # This works in Ruby 1.8 as well.
@@ -114,9 +113,9 @@ class TweetStats < Struct.new(:userid, :zipfile)
       @all_counts[period][:by_dow][tstamp.wday] ||= 0
       @all_counts[period][:by_dow][tstamp.wday] += 1
 
-      mentions.each { |user|
-        @all_counts[period][:by_mention][user] ||= 0
-        @all_counts[period][:by_mention][user] += 1
+      mentions.each { |mentioned_user|
+        @all_counts[period][:by_mention][mentioned_user] ||= 0
+        @all_counts[period][:by_mention][mentioned_user] += 1
       }
 
       @all_counts[period][:by_source][source] ||= 0
@@ -131,12 +130,11 @@ class TweetStats < Struct.new(:userid, :zipfile)
 
   DOWNAMES = %w{ Sun Mon Tue Wed Thu Fri Sat }
 
-
   def make_tooltip category, count
     "<div class=\"tooltip\"><strong>#{category}</strong><br />#{count} tweets</div>"
   end
 
-  def gen_report 
+  def gen_report
     report_data = {}
 
     months = @count_by_month.keys.sort { |a, b| a[0] <=> b[0] }
@@ -145,8 +143,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
     }.join ','
     first_mon = Date.civil(months.first[1], months.first[2], 15) << 1
     last_mon = Date.civil(months.last[1], months.last[2], 15)
-    report_data['by_month_min'] = [ first_mon.year, first_mon.mon - 1, first_mon.day ].join ','
-    report_data['by_month_max'] = [ last_mon.year, last_mon.mon - 1, last_mon.day ].join ','
+    report_data['by_month_min'] = [first_mon.year, first_mon.mon - 1, first_mon.day].join ','
+    report_data['by_month_max'] = [last_mon.year, last_mon.mon - 1, last_mon.day].join ','
 
     by_dow_data = {}
     COUNT_DEFS.each { |period, periodinfo|
@@ -166,8 +164,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
 
     by_mention_data = {}
     COUNT_DEFS.each { |period, periodinfo|
-      by_mention_data[period] = @all_counts[period][:by_mention].keys.sort { |a, b| 
-        @all_counts[period][:by_mention][b] <=> @all_counts[period][:by_mention][a] 
+      by_mention_data[period] = @all_counts[period][:by_mention].keys.sort { |a, b|
+        @all_counts[period][:by_mention][b] <=> @all_counts[period][:by_mention][a]
       }.first(10).map { |user|
         "[ '@#{user}', #{@all_counts[period][:by_mention][user]} ]"
       }.join ','
@@ -176,8 +174,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
 
     by_source_data = {}
     COUNT_DEFS.each { |period, periodinfo|
-      by_source_data[period] = @all_counts[period][:by_source].keys.sort { |a, b| 
-        @all_counts[period][:by_source][b] <=> @all_counts[period][:by_source][a] 
+      by_source_data[period] = @all_counts[period][:by_source].keys.sort { |a, b|
+        @all_counts[period][:by_source][b] <=> @all_counts[period][:by_source][a]
       }.first(10).map { |source|
         "[ '#{source}', #{@all_counts[period][:by_source][source]} ]"
       }.join ','
@@ -186,8 +184,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
 
     by_words_data = {}
     COUNT_DEFS.each { |period, periodinfo|
-      by_words_data[period] = @all_counts[period][:by_word].keys.sort { |a, b| 
-        @all_counts[period][:by_word][b] <=> @all_counts[period][:by_word][a] 
+      by_words_data[period] = @all_counts[period][:by_word].keys.sort { |a, b|
+        @all_counts[period][:by_word][b] <=> @all_counts[period][:by_word][a]
       }.first(100).map { |word|
         "{text: \"#{word}\", weight: #{@all_counts[period][:by_word][word]} }"
       }.join ','
@@ -199,7 +197,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data.to_json
   end
 
-  def process_zipfile 
+  def process_zipfile
     Zip::ZipFile.open(zipfile) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
 
@@ -241,7 +239,6 @@ class TweetStats < Struct.new(:userid, :zipfile)
     Rails.logger.error errormsg
     Rails.logger.error e.backtrace.join("\n")
 
-    User.update_status :userid => userid, :status => 'error', :errorMsg => errormsg
+    User.update_status :userid => userid, :status => 'error', :error_msg => errormsg
   end
 end
-
