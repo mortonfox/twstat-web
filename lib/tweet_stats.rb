@@ -1,3 +1,6 @@
+# Process a Twitter archive and generate a web page of stats and charts.
+# Author: Po Shan Cheah http://mortonfox.com
+
 require 'csv'
 require 'zip/zipfilesystem'
 require 'tempfile'
