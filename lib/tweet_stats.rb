@@ -10,16 +10,15 @@ end
 
 # Process tweet stats from a tweets.zip file.
 class TweetStats < Struct.new(:userid, :zipfile)
-
   COUNT_DEFS = {
-    :alltime => { :title => 'all time', :days => nil, },
-    :last30 => { :title => 'last 30 days', :days => 30, },
+    alltime: { title: 'all time', days: nil, },
+    last30: { title: 'last 30 days', days: 30, },
   }
 
   MENTION_REGEX = /\B@([A-Za-z0-9_]+)/
-  STRIP_A_TAG = /<a[^>]*>(.*)<\/a>/
+  STRIP_A_TAG = %r{<a[^>]*>(.*)</a>}
 
-  COMMON_WORDS = %w{
+  COMMON_WORDS = %w(
     the and you that
     was for are with his they
     this have from one had word
@@ -31,7 +30,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     than first water been call who oil its now
     find long down day did get come made may part
     http com net org www https
-  }
+  )
 
   attr_reader :row_count
 
@@ -41,11 +40,11 @@ class TweetStats < Struct.new(:userid, :zipfile)
     @all_counts = {}
     COUNT_DEFS.keys.each { |period|
       @all_counts[period] = {
-        :by_dow => {},
-        :by_hour => {},
-        :by_mention => {},
-        :by_source => {},
-        :by_word => {},
+        by_dow: {},
+        by_hour: {},
+        by_mention: {},
+        by_source: {},
+        by_word: {},
       }
     }
 
@@ -65,14 +64,14 @@ class TweetStats < Struct.new(:userid, :zipfile)
     # Skip malformed/short rows.
     return if row.size < 8
 
-    _, _, _, tstamp_str, source_str, tweet_str, _, _, _, _ = row
+    _, _, _, tstamp_str, source_str, tweet_str = row
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      user = User.update_status :userid => userid, :status => 'busy', :tweets_done => @row_count, :until_date => tstamp
+      user = User.update_status userid: userid, status: 'busy', tweets_done: @row_count, until_date: tstamp
       if user.cancel
         # User requested job cancel.
-        User.update_status :userid => userid, :status => 'ready'
+        User.update_status userid: userid, status: 'ready'
         fail CanceledException
       end
     end
@@ -82,7 +81,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     unless @newest_tstamp
       @newest_tstamp = tstamp
 
-      COUNT_DEFS.each { |period, periodinfo|
+      COUNT_DEFS.each { |_period, periodinfo|
         periodinfo[:cutoff] = nil
         periodinfo[:cutoff] = @newest_tstamp - periodinfo[:days] * 24 * 60 * 60 if periodinfo[:days]
       }
@@ -91,7 +90,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     # This assumes that tweets.csv is ordered from newest to oldest.
     @oldest_tstamp = tstamp
 
-    mon_key = [sprintf('%04d-%02d', tstamp.year, tstamp.mon), tstamp.year, tstamp.mon]
+    mon_key = [format('%04d-%02d', tstamp.year, tstamp.mon), tstamp.year, tstamp.mon]
     @count_by_month[mon_key] ||= 0
     @count_by_month[mon_key] += 1
 
@@ -131,7 +130,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     }
   end
 
-  DOWNAMES = %w{ Sun Mon Tue Wed Thu Fri Sat }
+  DOWNAMES = %w( Sun Mon Tue Wed Thu Fri Sat )
 
   def make_tooltip category, count
     "<div class=\"tooltip\"><strong>#{category}</strong><br />#{count} tweets</div>"
@@ -150,7 +149,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_month_max'] = [last_mon.year, last_mon.mon - 1, last_mon.day].join ','
 
     by_dow_data = {}
-    COUNT_DEFS.each { |period, periodinfo|
+    COUNT_DEFS.each { |period, _periodinfo|
       by_dow_data[period] = 0.upto(6).map { |dow|
         "['#{DOWNAMES[dow]}', #{@all_counts[period][:by_dow][dow].to_i}, '#{make_tooltip DOWNAMES[dow], @all_counts[period][:by_dow][dow].to_i}']"
       }.join ','
@@ -158,7 +157,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_dow_data'] = by_dow_data
 
     by_hour_data = {}
-    COUNT_DEFS.each { |period, periodinfo|
+    COUNT_DEFS.each { |period, _periodinfo|
       by_hour_data[period] = 0.upto(23).map { |hour|
         "[#{hour}, #{@all_counts[period][:by_hour][hour].to_i}, '#{make_tooltip "Hour #{hour}", @all_counts[period][:by_hour][hour].to_i}']"
       }.join ','
@@ -166,7 +165,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_hour_data'] = by_hour_data
 
     by_mention_data = {}
-    COUNT_DEFS.each { |period, periodinfo|
+    COUNT_DEFS.each { |period, _periodinfo|
       by_mention_data[period] = @all_counts[period][:by_mention].keys.sort { |a, b|
         @all_counts[period][:by_mention][b] <=> @all_counts[period][:by_mention][a]
       }.first(10).map { |user|
@@ -176,7 +175,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_mention_data'] = by_mention_data
 
     by_source_data = {}
-    COUNT_DEFS.each { |period, periodinfo|
+    COUNT_DEFS.each { |period, _periodinfo|
       by_source_data[period] = @all_counts[period][:by_source].keys.sort { |a, b|
         @all_counts[period][:by_source][b] <=> @all_counts[period][:by_source][a]
       }.first(10).map { |source|
@@ -186,7 +185,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     report_data['by_source_data'] = by_source_data
 
     by_words_data = {}
-    COUNT_DEFS.each { |period, periodinfo|
+    COUNT_DEFS.each { |period, _periodinfo|
       by_words_data[period] = @all_counts[period][:by_word].keys.sort { |a, b|
         @all_counts[period][:by_word][b] <=> @all_counts[period][:by_word][a]
       }.first(100).map { |word|
@@ -203,11 +202,10 @@ class TweetStats < Struct.new(:userid, :zipfile)
   def process_zipfile
     Zip::ZipFile.open(zipfile) { |zipf|
       zipf.file.open('tweets.csv', 'r') { |f|
-
         # Save tweets.csv to tempfile because Ruby 1.9 CSV needs to be able
         # to move the file pointer in the IO Stream. Ruby 2.0 CSV got rid
         # of that requirement.
-        tempfile = Tempfile.new ['tweetdata', '.csv'], :encoding => 'ascii-8bit'
+        tempfile = Tempfile.new ['tweetdata', '.csv'], encoding: 'ascii-8bit'
         tempfile.write f.read
         tempfile.rewind
 
@@ -227,7 +225,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
     }
 
     report = gen_report
-    User.update_status :userid => userid, :status => 'ready', :report => report
+    User.update_status userid: userid, status: 'ready', report: report
   end
 
   def run
@@ -237,11 +235,11 @@ class TweetStats < Struct.new(:userid, :zipfile)
     Rails.logger.info "Finished TweetStats::run. (user: #{userid} file: #{zipfile})"
   rescue CanceledException
     Rails.logger.info "Canceled TweetStats::run. (user: #{userid} file: #{zipfile})"
-  rescue Exception => e
+  rescue => e
     errormsg = "Error in TweetStats::run: #{e}"
     Rails.logger.error errormsg
     Rails.logger.error e.backtrace.join("\n")
 
-    User.update_status :userid => userid, :status => 'error', :error_msg => errormsg
+    User.update_status userid: userid, status: 'error', error_msg: errormsg
   end
 end
