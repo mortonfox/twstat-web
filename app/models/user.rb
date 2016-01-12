@@ -1,6 +1,6 @@
 # user record in database.
 class User < ActiveRecord::Base
-  attr_accessible :report, :status, :userid, :username
+  # attr_accessible :report, :status, :userid, :username
 
   def self.update_status params = {}
     userid     = params[:userid] or fail 'Error in User::update_status: userid not specified'

@@ -2,7 +2,7 @@
 # Author: Po Shan Cheah http://mortonfox.com
 
 require 'csv'
-require 'zip/zipfilesystem'
+require 'zip'
 require 'tempfile'
 
 class CanceledException < RuntimeError
@@ -200,8 +200,8 @@ class TweetStats < Struct.new(:userid, :zipfile)
   end
 
   def process_zipfile
-    Zip::ZipFile.open(zipfile) { |zipf|
-      zipf.file.open('tweets.csv', 'r') { |f|
+    Zip::File.open(zipfile) { |zipf|
+      zipf.get_input_stream('tweets.csv') { |f|
         # Save tweets.csv to tempfile because Ruby 1.9 CSV needs to be able
         # to move the file pointer in the IO Stream. Ruby 2.0 CSV got rid
         # of that requirement.
