@@ -37,7 +37,7 @@
   <p>
   <% if @last_generated %>
     <%= link_to 'View report', { :action => :report, :userid => @userid }, :class => 'btn' %><br />
-    <small>(Last report run: <%= @last_generated.strftime '%Y-%m-%d %H:%M' %>)</small>
+    <small>(Last report run: <%= @last_generated.strftime '%Y-%m-%d %H:%M %z' %>)</small>
   <% else %>
     No saved report.
   <% end %>
