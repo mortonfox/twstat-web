@@ -117,7 +117,7 @@ class TwstatController < ApplicationController
       @uploadtemp.close
 
       User.update_status :userid => @userid, :status => 'waiting'
-      TweetStats.new(@userid, @uploadtemp.path).delay.run
+      TweetStats.new(userid: @userid, zipfile: @uploadtemp.path).delay.run
 
     else
       flash[:formError] = 'Please select a file to upload.'

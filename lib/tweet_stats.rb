@@ -9,7 +9,7 @@ class CanceledException < RuntimeError
 end
 
 # Process tweet stats from a tweets.zip file.
-class TweetStats < Struct.new(:userid, :zipfile)
+class TweetStats
   COUNT_DEFS = {
     alltime: { title: 'all time', days: nil, },
     last30: { title: 'last 30 days', days: 30, },
@@ -32,7 +32,12 @@ class TweetStats < Struct.new(:userid, :zipfile)
     http com net org www https
   )
 
-  attr_reader :row_count
+  attr_reader :userid
+
+  def initialize params = {}
+    @userid = params[:userid]
+    @zipfile = params[:zipfile]
+  end
 
   def init
     @count_by_month = {}
@@ -72,10 +77,10 @@ class TweetStats < Struct.new(:userid, :zipfile)
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
-      user = User.update_status userid: userid, status: 'busy', tweets_done: @row_count, until_date: tstamp
+      user = User.update_status userid: @userid, status: 'busy', tweets_done: @row_count, until_date: tstamp
       if user.cancel
         # User requested job cancel.
-        User.update_status userid: userid, status: 'ready'
+        User.update_status userid: @userid, status: 'ready'
         fail CanceledException
       end
     end
@@ -209,7 +214,7 @@ class TweetStats < Struct.new(:userid, :zipfile)
   end
 
   def process_zipfile
-    Zip::File.open(zipfile) { |zipf|
+    Zip::File.open(@zipfile) { |zipf|
       zipf.get_input_stream('tweets.csv') { |f|
         # Save tweets.csv to tempfile because Ruby 1.9 CSV needs to be able
         # to move the file pointer in the IO Stream. Ruby 2.0 CSV got rid
@@ -234,21 +239,21 @@ class TweetStats < Struct.new(:userid, :zipfile)
     }
 
     report = gen_report
-    User.update_status userid: userid, status: 'ready', report: report
+    User.update_status userid: @userid, status: 'ready', report: report
   end
 
   def run
-    Rails.logger.info "Running TweetStats::run... (user: #{userid} file: #{zipfile})"
+    Rails.logger.info "Running TweetStats::run... (user: #{@userid} file: #{@zipfile})"
     init
     process_zipfile
-    Rails.logger.info "Finished TweetStats::run. (user: #{userid} file: #{zipfile})"
+    Rails.logger.info "Finished TweetStats::run. (user: #{@userid} file: #{@zipfile})"
   rescue CanceledException
-    Rails.logger.info "Canceled TweetStats::run. (user: #{userid} file: #{zipfile})"
+    Rails.logger.info "Canceled TweetStats::run. (user: #{@userid} file: #{@zipfile})"
   rescue => e
     errormsg = "Error in TweetStats::run: #{e}"
     Rails.logger.error errormsg
     Rails.logger.error e.backtrace.join("\n")
 
-    User.update_status userid: userid, status: 'error', error_msg: errormsg
+    User.update_status userid: @userid, status: 'error', error_msg: errormsg
   end
 end
