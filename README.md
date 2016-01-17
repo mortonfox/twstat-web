@@ -19,7 +19,7 @@ February 2013, it was available to all users.
 
 To request your Twitter archive:
 
-1. Visit https://twitter.com/settings/account
+1. Visit <https://twitter.com/settings/account>
 1. Click on the "Request your archive" button. (near the bottom of the settings page)
 1. Wait for an email from Twitter with a download link.
 
@@ -31,7 +31,7 @@ on your web hosting setup.
 By default, twstat-web uses SQLite for the database backend. Edit
 `config/database.yml` if you wish to use a different database server.
 
-Sign up for a Twitter API key at https://apps.twitter.com/ and add it to the
+Sign up for a Twitter API key at <https://apps.twitter.com/> and add it to the
 production section in `config/apikeys.yml`. You may also add a development API
 key here if you are installing another copy for testing.
 
