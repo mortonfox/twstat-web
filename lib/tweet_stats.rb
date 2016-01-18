@@ -3,7 +3,6 @@
 
 require 'csv'
 require 'zip'
-require 'tempfile'
 
 class CanceledException < RuntimeError
 end
@@ -18,6 +17,7 @@ class TweetStats
   MENTION_REGEX = /\B@([A-Za-z0-9_]+)/
   STRIP_A_TAG = %r{<a[^>]*>(.*)</a>}
 
+  # Common words to exclude from the word cloud.
   COMMON_WORDS = %w(
     the and you that
     was for are with his they
@@ -216,25 +216,9 @@ class TweetStats
   def process_zipfile
     Zip::File.open(@zipfile) { |zipf|
       zipf.get_input_stream('tweets.csv') { |f|
-        # Save tweets.csv to tempfile because Ruby 1.9 CSV needs to be able
-        # to move the file pointer in the IO Stream. Ruby 2.0 CSV got rid
-        # of that requirement.
-        tempfile = Tempfile.new ['tweetdata', '.csv'], encoding: 'ascii-8bit'
-        tempfile.write f.read
-        tempfile.rewind
-
-        # CSV module is different in Ruby 1.8.
-        if CSV.const_defined? :Reader
-          CSV::Reader.parse(tempfile) { |row|
-            process_row row
-          }
-        else
-          CSV.parse(tempfile) { |row|
-            process_row row
-          }
-        end
-
-        tempfile.close
+        CSV.parse(f) { |row|
+          process_row row
+        }
       }
     }
 
