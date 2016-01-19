@@ -67,13 +67,12 @@ class TweetStats
   def process_row row
     @row_count += 1
 
-    # Skip header row.
-    return if @row_count <= 1
-
     # Skip malformed/short rows.
     return if row.size < 8
 
-    _, _, _, tstamp_str, source_str, tweet_str = row
+    tstamp_str = row['timestamp']
+    source_str = row['source']
+    tweet_str = row['text']
     tstamp = Time.parse tstamp_str
 
     if @row_count % PROGRESS_INTERVAL == 0
@@ -216,7 +215,7 @@ class TweetStats
   def process_zipfile
     Zip::File.open(@zipfile) { |zipf|
       zipf.get_input_stream('tweets.csv') { |f|
-        CSV.parse(f) { |row|
+        CSV.parse(f, headers: true) { |row|
           process_row row
         }
       }
