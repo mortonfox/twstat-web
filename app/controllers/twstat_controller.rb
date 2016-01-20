@@ -57,7 +57,7 @@ class TwstatController < ApplicationController
     session[:username] = @user_info['screen_name']
     session[:userid] = @user_info['id']
 
-    User.find_or_create_by_userid(session[:userid]) { |u| 
+    User.find_or_create_by(userid: session[:userid]) { |u| 
       u.username = session[:username] 
     }
     
