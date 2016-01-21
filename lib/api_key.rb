@@ -12,9 +12,7 @@ class ApiKey
       fail "No #{field} for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey[field]
 
       # Define an accessor for each API key field.
-      class_eval {
-        define_method(field) { @apikey[field] }
-      }
+      define_singleton_method(field) { @apikey[field] }
     }
   end
 end
