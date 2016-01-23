@@ -1,13 +1,11 @@
 # Process a Twitter archive and generate a web page of stats and charts.
 # Author: Po Shan Cheah http://mortonfox.com
 
-
 require 'tempfile'
 require 'tweet_stats'
 require 'api_key'
 
 class TwstatController < ApplicationController
-
   def initialize
     super
     @COUNT_DEFS = TweetStats::COUNT_DEFS
@@ -15,17 +13,14 @@ class TwstatController < ApplicationController
 
   def index
     @title = 'Log in'
-    if session[:userid]
-      redirect_to :action => :dashboard
-      return
-    end
+    redirect_to action: :dashboard if session[:userid]
   end
 
   def login
     apikey = ApiKey.new
     oauth = OAuth::Consumer.new(apikey.consumer_key, apikey.consumer_secret,
-                                { :site => "https://api.twitter.com" })
-    request_token = oauth.get_request_token(:oauth_callback => apikey.callback_url)
+                                site: 'https://api.twitter.com')
+    request_token = oauth.get_request_token(oauth_callback: apikey.callback_url)
 
     session[:request_token] = request_token.token
     session[:request_token_secret] = request_token.secret
@@ -35,33 +30,33 @@ class TwstatController < ApplicationController
   def logout
     session[:userid] = nil
     session[:username] = nil
-    redirect_to :action => :index
+    redirect_to action: :index
   end
 
   def oauth
     unless params[:oauth_verifier]
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
     apikey = ApiKey.new
     oauth = OAuth::Consumer.new(apikey.consumer_key, apikey.consumer_secret,
-                                { :site => "https://api.twitter.com" })
+                                site: 'https://api.twitter.com')
     request_token = OAuth::RequestToken.new(oauth, session[:request_token],
                                             session[:request_token_secret])
-    access_token = request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
+    access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
 
-    response = oauth.request(:get, '/1.1/account/verify_credentials.json', access_token, { :scheme => :query_string })
+    response = oauth.request(:get, '/1.1/account/verify_credentials.json', access_token, scheme: :query_string)
     @user_info = JSON.parse response.body
 
     session[:username] = @user_info['screen_name']
     session[:userid] = @user_info['id']
 
-    User.find_or_create_by(userid: session[:userid]) { |u| 
-      u.username = session[:username] 
+    User.find_or_create_by(userid: session[:userid]) { |u|
+      u.username = session[:username]
     }
-    
-    redirect_to :action => :dashboard
+
+    redirect_to action: :dashboard
   end
 
   def dashboard
@@ -69,7 +64,7 @@ class TwstatController < ApplicationController
 
     @userid = session[:userid]
     unless @userid
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
@@ -79,7 +74,7 @@ class TwstatController < ApplicationController
       # No user record? Let user log in again.
       session[:userid] = nil
       session[:username] = nil
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
@@ -93,7 +88,7 @@ class TwstatController < ApplicationController
     if @user_status['status'] == 'error'
       # Grab the error message for display and clear the error.
       @error_msg = @user_status['errorMsg']
-      User.update_status :userid => @userid, :status => 'ready'
+      User.update_status userid: @userid, status: 'ready'
     end
 
     @last_generated = @user.last_generated
@@ -104,26 +99,24 @@ class TwstatController < ApplicationController
   def upload
     @userid = session[:userid]
     unless @userid
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
     uploaded_file = params[:tweetdata]
 
     if uploaded_file
-
-      @uploadtemp = Tempfile.new ['tweetdata', '.zip'], :encoding => 'ascii-8bit'
+      @uploadtemp = Tempfile.new ['tweetdata', '.zip'], encoding: 'ascii-8bit'
       @uploadtemp.write uploaded_file.read
       @uploadtemp.close
 
-      User.update_status :userid => @userid, :status => 'waiting'
+      User.update_status userid: @userid, status: 'waiting'
       TweetStats.new(userid: @userid, zipfile: @uploadtemp.path).delay.run
-
     else
       flash[:formError] = 'Please select a file to upload.'
     end
 
-    redirect_to :action => :dashboard
+    redirect_to action: :dashboard
   end
 
   def about
@@ -134,30 +127,29 @@ class TwstatController < ApplicationController
   def cancel
     @userid = session[:userid]
     unless @userid
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
     Delayed::Job.all.each { |job|
-      if job.name =~ /^TweetStats/ and job.payload_object.userid == @userid and not job.failed?
-        if job.locked_at
-          user = User.find_by_userid @userid
-          if user
-            user.cancel = true
-            user.save
-            # Already running. Wait for job to cancel itself.
-            redirect_to :action => :dashboard
-            return
-          end
-        else
-          job.destroy
+      next unless job.name =~ /^TweetStats/ && job.payload_object.userid == @userid && !job.failed?
+      if job.locked_at
+        user = User.find_by_userid @userid
+        if user
+          user.cancel = true
+          user.save
+          # Already running. Wait for job to cancel itself.
+          redirect_to action: :dashboard
+          return
         end
+      else
+        job.destroy
       end
     }
 
     # No job running for this user. We can simply reset the status.
-    User.update_status :userid => @userid, :status => 'ready'
-    redirect_to :action => :dashboard
+    User.update_status userid: @userid, status: 'ready'
+    redirect_to action: :dashboard
   end
 
   def report
@@ -169,14 +161,14 @@ class TwstatController < ApplicationController
     elsif session[:userid]
       userid = session[:userid]
     else
-      redirect_to :action => :index
+      redirect_to action: :index
       return
     end
 
     user = User.find_by_userid userid
 
     unless user.report
-      redirect_to :action => :dashboard
+      redirect_to action: :dashboard
       return
     end
     report = JSON.parse user.report
@@ -191,6 +183,6 @@ class TwstatController < ApplicationController
     @by_words_data = report['by_words_data']
     @subtitle = report['subtitle']
 
-    render :template => 'twstat/report', :layout => false
+    render template: 'twstat/report', layout: false
   end
 end
