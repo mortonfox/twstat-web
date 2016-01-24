@@ -8,7 +8,7 @@ require 'api_key'
 class TwstatController < ApplicationController
   def initialize
     super
-    @COUNT_DEFS = TweetStats::COUNT_DEFS
+    @count_defs = TweetStats::COUNT_DEFS
   end
 
   def index
