@@ -1,7 +1,7 @@
 # Helper class for reading Twitter API key file.
 class ApiKey
-  APIKEYS_FNAME = 'apikeys.yml'
-  APIKEY_FIELDS = %w(consumer_key consumer_secret callback_url)
+  APIKEYS_FNAME = 'apikeys.yml'.freeze
+  APIKEY_FIELDS = %w(consumer_key consumer_secret callback_url).freeze
 
   def initialize
     @apikey = YAML.load(Rails.root.join('config', APIKEYS_FNAME).open)[Rails.env]
