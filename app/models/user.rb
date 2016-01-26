@@ -1,13 +1,13 @@
 # user record in database.
 class User < ActiveRecord::Base
-  # attr_accessible :report, :status, :userid, :username
-
   def self.update_status params = {}
-    userid     = params[:userid] or fail 'Error in User::update_status: userid not specified'
-    status     = params[:status] || 'ready'
+    userid = params[:userid]
+    fail 'Error in User::update_status: userid not specified' unless userid
+
+    status      = params[:status] || 'ready'
     tweets_done = params[:tweets_done] || 0
     until_date  = params[:until_date] || ''
-    report     = params[:report]
+    report      = params[:report]
     error_msg   = params[:error_msg]
 
     datestr = case until_date
