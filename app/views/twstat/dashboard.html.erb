@@ -36,7 +36,7 @@
 
   <p>
   <% if @last_generated %>
-    <%= link_to 'View report', { :action => :report, :userid => @userid }, :class => 'btn' %><br />
+    <%= link_to 'View report', { :action => :report, :userid => @userid }, :class => 'btn btn-default' %><br />
     <small>(Last report run: <%= @last_generated.strftime '%Y-%m-%d %H:%M %z' %>)</small>
   <% else %>
     No saved report.
@@ -54,7 +54,7 @@
       <%= label_tag :tweetdata, 'Upload tweets.zip file: ' %>
 
       <div class="fileinput fileinput-new" data-provides="fileinput">
-        <span class="btn btn-file"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" id="tweetdata" name="tweetdata" /></span>
+        <span class="btn btn-default btn-file"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" id="tweetdata" name="tweetdata" /></span>
         <span class="fileinput-preview"></span>
         <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">×</a>
       </div>
