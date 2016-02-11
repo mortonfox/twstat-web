@@ -2,9 +2,15 @@
 
 ## Introduction
 
-This is a Rails web interface wrapper around
-[twstat](https://github.com/mortonfox/twstat), a script that generates a page
-of charts from a Twitter archive.
+This is a Rails website that provides a web interface for
+[twstat](https://github.com/mortonfox/twstat). twstat is a script that
+generates a single web page of charts from the data in a Twitter archive.
+
+The generated web page references the following libraries from online sources:
+
+* jQuery (from [CDNJS](http://cdnjs.com/))
+* [jQCloud](https://github.com/lucaong/jQCloud) jQuery plugin (from [CDNJS](http://cdnjs.com/))
+* [Google Chart Tools](https://developers.google.com/chart/)
 
 ### Twitter archive
 
