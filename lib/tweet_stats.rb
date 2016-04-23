@@ -80,7 +80,7 @@ class TweetStats
       if user.cancel
         # User requested job cancel.
         User.update_status userid: @userid, status: 'ready'
-        fail CanceledException
+        raise CanceledException
       end
     end
 

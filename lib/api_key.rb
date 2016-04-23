@@ -5,11 +5,11 @@ class ApiKey
 
   def initialize
     @apikey = YAML.load(Rails.root.join('config', APIKEYS_FNAME).open)[Rails.env]
-    fail "No API key for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey
+    raise "No API key for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey
 
     APIKEY_FIELDS.each { |field|
       # Verify that the API key field exists.
-      fail "No #{field} for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey[field]
+      raise "No #{field} for #{Rails.env} environment in #{APIKEYS_FNAME}" unless @apikey[field]
 
       # Define an accessor for each API key field.
       define_singleton_method(field) { @apikey[field] }
