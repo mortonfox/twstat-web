@@ -2,7 +2,7 @@
 class User < ActiveRecord::Base
   def self.update_status params = {}
     userid = params[:userid]
-    fail 'Error in User::update_status: userid not specified' unless userid
+    raise 'Error in User::update_status: userid not specified' unless userid
 
     status      = params[:status] || 'ready'
     tweets_done = params[:tweets_done] || 0
