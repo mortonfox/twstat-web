@@ -131,6 +131,8 @@ class TwstatController < ApplicationController
       return
     end
 
+    job_running = false
+
     Delayed::Job.all.each { |job|
       next unless job.name =~ /^TweetStats/ && job.payload_object.userid == @userid && !job.failed?
       if job.locked_at
@@ -138,17 +140,19 @@ class TwstatController < ApplicationController
         if user
           user.cancel = true
           user.save
+
           # Already running. Wait for job to cancel itself.
-          redirect_to action: :dashboard
-          return
+          job_running = true
+          break
         end
       else
         job.destroy
       end
     }
 
-    # No job running for this user. We can simply reset the status.
-    User.update_status userid: @userid, status: 'ready'
+    # If no job is running for this user, we can simply reset the status.
+    User.update_status userid: @userid, status: 'ready' unless job_running
+
     redirect_to action: :dashboard
   end
 
