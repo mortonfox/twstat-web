@@ -32,6 +32,12 @@ class TweetStats
     http com net org www https
   ).freeze
 
+  COLORS = %w(
+    #673AB7 #3F51B5 #2196F3
+    #009688 #4CAF50 #FF5722
+    #E91E63
+  )
+
   attr_reader :userid
 
   def initialize params = {}
@@ -153,8 +159,8 @@ class TweetStats
     report_data = {}
 
     months = @count_by_month.keys.sort { |a, b| a[0] <=> b[0] }
-    report_data['by_month_data'] = months.map { |mon|
-      "[new Date(#{mon[1]}, #{mon[2] - 1}), #{@count_by_month[mon]}, '#{make_tooltip mon[0], @count_by_month[mon]}']"
+    report_data['by_month_data'] = months.map.with_index { |mon, i|
+      "[new Date(#{mon[1]}, #{mon[2] - 1}), #{@count_by_month[mon]}, '#{make_tooltip mon[0], @count_by_month[mon]}', '#{COLORS[i % 6]}']"
     }.join ','
     first_mon = Date.civil(months.first[1], months.first[2], 15) << 1
     last_mon = Date.civil(months.last[1], months.last[2], 15)

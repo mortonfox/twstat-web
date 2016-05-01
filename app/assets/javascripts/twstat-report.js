@@ -9,6 +9,7 @@ function draw_by_month(month_data, month_min, month_max) {
   data.addColumn('date', 'Month');
   data.addColumn('number', 'Count');
   data.addColumn({type:'string', role:'tooltip', p: {html: true}});
+  data.addColumn({type:'string', role:'style'});
   data.addRows(month_data);
 
   // Create and draw the visualization.
