@@ -170,7 +170,7 @@ class TweetStats
     by_dow_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
       by_dow_data[period] = 0.upto(6).map { |dow|
-        "['#{DOWNAMES[dow]}', #{@all_counts[period][:by_dow][dow].to_i}, '#{make_tooltip DOWNAMES[dow], @all_counts[period][:by_dow][dow].to_i}']"
+        "['#{DOWNAMES[dow]}', #{@all_counts[period][:by_dow][dow].to_i}, '#{make_tooltip DOWNAMES[dow], @all_counts[period][:by_dow][dow].to_i}', '#{COLORS[dow]}']"
       }.join ','
     }
     report_data['by_dow_data'] = by_dow_data

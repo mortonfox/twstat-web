@@ -46,6 +46,7 @@ function draw_by_dow(dow_data, chart_title, elemid) {
   data.addColumn('string', 'Day of Week');
   data.addColumn('number', 'Count');
   data.addColumn({type:'string', role:'tooltip', p: {html: true}});
+  data.addColumn({type:'string', role:'style'});
   data.addRows(dow_data);
 
   // Create and draw the visualization.
