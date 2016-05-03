@@ -76,6 +76,7 @@ function draw_by_hour(hour_data, chart_title, elemid) {
   data.addColumn('number', 'Hour');
   data.addColumn('number', 'Count');
   data.addColumn({type:'string', role:'tooltip', p: {html: true}});
+  data.addColumn({type:'string', role:'style'});
   data.addRows(hour_data);
 
   // Create and draw the visualization.

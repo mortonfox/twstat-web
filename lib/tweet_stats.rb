@@ -178,7 +178,7 @@ class TweetStats
     by_hour_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
       by_hour_data[period] = 0.upto(23).map { |hour|
-        "[#{hour}, #{@all_counts[period][:by_hour][hour].to_i}, '#{make_tooltip "Hour #{hour}", @all_counts[period][:by_hour][hour].to_i}']"
+        "[#{hour}, #{@all_counts[period][:by_hour][hour].to_i}, '#{make_tooltip "Hour #{hour}", @all_counts[period][:by_hour][hour].to_i}', '#{COLORS[hour % 6]}']"
       }.join ','
     }
     report_data['by_hour_data'] = by_hour_data
