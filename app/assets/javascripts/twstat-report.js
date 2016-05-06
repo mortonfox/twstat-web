@@ -107,6 +107,7 @@ function draw_by_mention(mention_data, chart_title, elemid) {
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'User');
   data.addColumn('number', 'Count');
+  data.addColumn({type:'string', role:'style'});
   data.addRows(mention_data);
 
   // Create and draw the visualization.
