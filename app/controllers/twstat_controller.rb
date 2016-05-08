@@ -186,6 +186,7 @@ class TwstatController < ApplicationController
     @by_source_data = report['by_source_data']
     @by_words_data = report['by_words_data']
     @subtitle = report['subtitle']
+    @extra_css = report['extra_css']
 
     render template: 'twstat/report', layout: false
   end

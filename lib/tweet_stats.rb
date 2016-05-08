@@ -215,6 +215,11 @@ class TweetStats
 
     report_data['subtitle'] = "from #{@oldest_tstamp.strftime '%Y-%m-%d'} to #{@newest_tstamp.strftime '%Y-%m-%d'}"
 
+    # Add custom colors to the word clouds.
+    report_data['extra_css'] = 0.upto(9).map { |i|
+      ".w#{10 - i} { color: #{COLORS[i % COLORS.size]} !important; }"
+    }.join("\n")
+
     report_data.to_json
   end
 
