@@ -36,7 +36,7 @@ class TweetStats
     #673AB7 #3F51B5 #2196F3
     #009688 #4CAF50 #FF5722
     #E91E63
-  )
+  ).freeze
 
   attr_reader :userid
 
