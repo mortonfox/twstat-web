@@ -128,20 +128,22 @@ class TweetStats
     COUNT_DEFS.each { |period, periodinfo|
       next if periodinfo[:cutoff] && tstamp < periodinfo[:cutoff]
 
+      period_counts = @all_counts[period]
+
       # Archive entries before this point all have 00:00:00 as the time, so
       # don't include them in the by-hour chart.
-      @all_counts[period][:by_hour][tstamp.hour] += 1 if tstamp >= ZERO_TIME_CUTOFF
+      period_counts[:by_hour][tstamp.hour] += 1 if tstamp >= ZERO_TIME_CUTOFF
 
-      @all_counts[period][:by_dow][tstamp.wday] += 1
+      period_counts[:by_dow][tstamp.wday] += 1
 
       mentions.each { |mentioned_user|
-        @all_counts[period][:by_mention][mentioned_user] += 1
+        period_counts[:by_mention][mentioned_user] += 1
       }
 
-      @all_counts[period][:by_source][source] += 1
+      period_counts[:by_source][source] += 1
 
       words.each { |word|
-        @all_counts[period][:by_word][word] += 1
+        period_counts[:by_word][word] += 1
       }
     }
   end
