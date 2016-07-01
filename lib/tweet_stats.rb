@@ -168,16 +168,18 @@ class TweetStats
 
     by_dow_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
+      period_counts_by_dow = @all_counts[period][:by_dow]
       by_dow_data[period] = 0.upto(6).map { |dow|
-        "['#{DOWNAMES[dow]}', #{@all_counts[period][:by_dow][dow].to_i}, '#{make_tooltip DOWNAMES[dow], @all_counts[period][:by_dow][dow].to_i}', '#{COLORS[dow]}']"
+        "['#{DOWNAMES[dow]}', #{period_counts_by_dow[dow].to_i}, '#{make_tooltip DOWNAMES[dow], period_counts_by_dow[dow].to_i}', '#{COLORS[dow]}']"
       }.join ','
     }
     report_data['by_dow_data'] = by_dow_data
 
     by_hour_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
+      period_counts_by_hour = @all_counts[period][:by_hour]
       by_hour_data[period] = 0.upto(23).map { |hour|
-        "[#{hour}, #{@all_counts[period][:by_hour][hour].to_i}, '#{make_tooltip "Hour #{hour}", @all_counts[period][:by_hour][hour].to_i}', '#{COLORS[hour % 6]}']"
+        "[#{hour}, #{period_counts_by_hour[hour].to_i}, '#{make_tooltip "Hour #{hour}", period_counts_by_hour[hour].to_i}', '#{COLORS[hour % 6]}']"
       }.join ','
     }
     report_data['by_hour_data'] = by_hour_data
