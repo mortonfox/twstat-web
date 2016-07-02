@@ -186,20 +186,22 @@ class TweetStats
 
     by_mention_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
-      by_mention_data[period] = @all_counts[period][:by_mention].keys.sort { |a, b|
-        @all_counts[period][:by_mention][b] <=> @all_counts[period][:by_mention][a]
+      period_counts_by_mention = @all_counts[period][:by_mention]
+      by_mention_data[period] = period_counts_by_mention.keys.sort { |a, b|
+        period_counts_by_mention[b] <=> period_counts_by_mention[a]
       }.first(10).map.with_index { |user, i|
-        "[ '@#{user}', #{@all_counts[period][:by_mention][user]}, '#{COLORS[i % COLORS.size]}' ]"
+        "[ '@#{user}', #{period_counts_by_mention[user]}, '#{COLORS[i % COLORS.size]}' ]"
       }.join ','
     }
     report_data['by_mention_data'] = by_mention_data
 
     by_source_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
-      by_source_data[period] = @all_counts[period][:by_source].keys.sort { |a, b|
-        @all_counts[period][:by_source][b] <=> @all_counts[period][:by_source][a]
+      period_counts_by_source = @all_counts[period][:by_source]
+      by_source_data[period] = period_counts_by_source.keys.sort { |a, b|
+        period_counts_by_source[b] <=> period_counts_by_source[a]
       }.first(10).map.with_index { |source, i|
-        "[ '#{source}', #{@all_counts[period][:by_source][source]}, '#{COLORS[i % COLORS.size]}' ]"
+        "[ '#{source}', #{period_counts_by_source[source]}, '#{COLORS[i % COLORS.size]}' ]"
       }.join ','
     }
     report_data['by_source_data'] = by_source_data
