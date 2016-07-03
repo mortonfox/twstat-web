@@ -208,10 +208,11 @@ class TweetStats
 
     by_words_data = {}
     COUNT_DEFS.each { |period, _periodinfo|
-      by_words_data[period] = @all_counts[period][:by_word].keys.sort { |a, b|
-        @all_counts[period][:by_word][b] <=> @all_counts[period][:by_word][a]
+      period_counts_by_word = @all_counts[period][:by_word]
+      by_words_data[period] = period_counts_by_word.keys.sort { |a, b|
+        period_counts_by_word[b] <=> period_counts_by_word[a]
       }.first(100).map { |word|
-        "{text: \"#{word}\", weight: #{@all_counts[period][:by_word][word]} }"
+        "{text: \"#{word}\", weight: #{period_counts_by_word[word]} }"
       }.join ','
     }
     report_data['by_words_data'] = by_words_data
