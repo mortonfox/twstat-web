@@ -176,64 +176,76 @@ class TweetStats
     report_data['by_month_min'] = [first_mon.year, first_mon.mon - 1, first_mon.day].join ','
     report_data['by_month_max'] = [last_mon.year, last_mon.mon - 1, last_mon.day].join ','
 
-    by_dow_data = {}
-    COUNT_DEFS.each { |period, _periodinfo|
-      period_counts_by_dow = @all_counts[period][:by_dow]
-      by_dow_data[period] = 0.upto(6).map { |dow|
-        "['#{DOWNAMES[dow]}', #{period_counts_by_dow[dow].to_i}, '#{make_tooltip DOWNAMES[dow], period_counts_by_dow[dow].to_i}', '#{COLORS[dow]}']"
-      }.join ','
-    }
-    report_data['by_dow_data'] = by_dow_data
+    report_data['by_dow_data'] = Hash[
+      COUNT_DEFS.map { |period, _periodinfo|
+        period_counts_by_dow = @all_counts[period][:by_dow]
+        [
+          period, 
+          0.upto(6).map { |dow|
+            "['#{DOWNAMES[dow]}', #{period_counts_by_dow[dow].to_i}, '#{make_tooltip DOWNAMES[dow], period_counts_by_dow[dow].to_i}', '#{COLORS[dow]}']"
+          }.join(',')
+        ]
+      }
+    ]
 
-    by_hour_data = {}
-    COUNT_DEFS.each { |period, _periodinfo|
-      period_counts_by_hour = @all_counts[period][:by_hour]
-      by_hour_data[period] = 0.upto(23).map { |hour|
-        "[#{hour}, #{period_counts_by_hour[hour].to_i}, '#{make_tooltip "Hour #{hour}", period_counts_by_hour[hour].to_i}', '#{COLORS[hour % 6]}']"
-      }.join ','
-    }
-    report_data['by_hour_data'] = by_hour_data
+    report_data['by_hour_data'] = Hash[
+      COUNT_DEFS.map { |period, _periodinfo|
+        period_counts_by_hour = @all_counts[period][:by_hour]
+        [
+          period,
+          0.upto(23).map { |hour|
+            "[#{hour}, #{period_counts_by_hour[hour].to_i}, '#{make_tooltip "Hour #{hour}", period_counts_by_hour[hour].to_i}', '#{COLORS[hour % 6]}']"
+          }.join(',')
+        ]
+      }
+    ]
 
-    by_mention_data = {}
-    COUNT_DEFS.each { |period, _periodinfo|
-      period_counts_by_mention = @all_counts[period][:by_mention]
-      by_mention_data[period] =
-        period_counts_by_mention
-        .keys
-        .sort { |a, b| period_counts_by_mention[b] <=> period_counts_by_mention[a] }
-        .first(10)
-        .map
-        .with_index { |user, i| "[ '@#{user}', #{period_counts_by_mention[user]}, '#{COLORS[i % COLORS.size]}' ]" }
-        .join ','
-    }
-    report_data['by_mention_data'] = by_mention_data
+    report_data['by_mention_data'] = Hash[
+      COUNT_DEFS.map { |period, _periodinfo|
+        period_counts_by_mention = @all_counts[period][:by_mention]
+        [
+          period,
+          period_counts_by_mention
+          .keys
+          .sort { |a, b| period_counts_by_mention[b] <=> period_counts_by_mention[a] }
+          .first(10)
+          .map
+          .with_index { |user, i| "[ '@#{user}', #{period_counts_by_mention[user]}, '#{COLORS[i % COLORS.size]}' ]" }
+          .join(',')
+        ]
+      }
+    ]
 
-    by_source_data = {}
-    COUNT_DEFS.each { |period, _periodinfo|
-      period_counts_by_source = @all_counts[period][:by_source]
-      by_source_data[period] =
-        period_counts_by_source
-        .keys
-        .sort { |a, b| period_counts_by_source[b] <=> period_counts_by_source[a] }
-        .first(10)
-        .map
-        .with_index { |source, i| "[ '#{source}', #{period_counts_by_source[source]}, '#{COLORS[i % COLORS.size]}' ]" }
-        .join ','
-    }
-    report_data['by_source_data'] = by_source_data
+    report_data['by_source_data'] = Hash[
+      COUNT_DEFS.map { |period, _periodinfo|
+        period_counts_by_source = @all_counts[period][:by_source]
+        [
+          period,
+          period_counts_by_source
+          .keys
+          .sort { |a, b| period_counts_by_source[b] <=> period_counts_by_source[a] }
+          .first(10)
+          .map
+          .with_index { |source, i| "[ '#{source}', #{period_counts_by_source[source]}, '#{COLORS[i % COLORS.size]}' ]" }
+          .join(',')
+        ]
+      }
+    ]
 
-    by_words_data = {}
-    COUNT_DEFS.each { |period, _periodinfo|
-      period_counts_by_word = @all_counts[period][:by_word]
-      by_words_data[period] =
-        period_counts_by_word
-        .keys
-        .sort { |a, b| period_counts_by_word[b] <=> period_counts_by_word[a] }
-        .first(100)
-        .map { |word| "{text: \"#{word}\", weight: #{period_counts_by_word[word]} }" }
-        .join ','
-    }
-    report_data['by_words_data'] = by_words_data
+    report_data['by_words_data'] = Hash[
+      COUNT_DEFS.map { |period, _periodinfo|
+        period_counts_by_word = @all_counts[period][:by_word]
+        [
+          period,
+          period_counts_by_word
+          .keys
+          .sort { |a, b| period_counts_by_word[b] <=> period_counts_by_word[a] }
+          .first(100)
+          .map { |word| "{text: \"#{word}\", weight: #{period_counts_by_word[word]} }" }
+          .join(',')
+        ]
+      }
+    ]
 
     report_data['subtitle'] = "from #{@oldest_tstamp.strftime '%Y-%m-%d'} to #{@newest_tstamp.strftime '%Y-%m-%d'}"
 
