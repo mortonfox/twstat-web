@@ -3,6 +3,7 @@
 
 require 'csv'
 require 'zip'
+require 'ostruct'
 
 class CanceledException < RuntimeError
 end
@@ -67,6 +68,8 @@ class TweetStats
     @row_count = 0
     @newest_tstamp = nil
     @oldest_tstamp = nil
+
+    @mon_key = OpenStruct.new(datestr: '', year: -1, mon: -1)
   end
 
   PROGRESS_INTERVAL = 300
@@ -110,8 +113,8 @@ class TweetStats
     # This assumes that tweets.csv is ordered from newest to oldest.
     @oldest_tstamp = tstamp
 
-    mon_key = [format('%04d-%02d', tstamp.year, tstamp.mon), tstamp.year, tstamp.mon]
-    @count_by_month[mon_key] += 1
+    @mon_key = OpenStruct.new(datestr: format('%04d-%02d', tstamp.year, tstamp.mon), year: tstamp.year, mon: tstamp.mon) if tstamp.mon != @mon_key.mon
+    @count_by_month[@mon_key] += 1
 
     mentions = tweet_str.scan(MENTION_REGEX).map { |match| match[0].downcase }
     source = source_str.gsub(STRIP_A_TAG, '\1')
@@ -157,12 +160,19 @@ class TweetStats
   def gen_report
     report_data = {}
 
-    months = @count_by_month.keys.sort { |a, b| a[0] <=> b[0] }
-    report_data['by_month_data'] = months.map.with_index { |mon, i|
-      "[new Date(#{mon[1]}, #{mon[2] - 1}), #{@count_by_month[mon]}, '#{make_tooltip mon[0], @count_by_month[mon]}', '#{COLORS[i % 6]}']"
-    }.join ','
-    first_mon = Date.civil(months.first[1], months.first[2], 15) << 1
-    last_mon = Date.civil(months.last[1], months.last[2], 15)
+    month_counts = @count_by_month.sort_by { |month, _count| month.datestr }
+
+    report_data['by_month_data'] =
+      month_counts
+        .map
+        .with_index { |(mon, count), i|
+          "[new Date(#{mon.year}, #{mon.mon - 1}), #{count}, '#{make_tooltip mon.datestr, count}', '#{COLORS[i % 6]}']"
+        }.join ','
+
+    first_month_rec = month_counts.first.first
+    first_mon = Date.civil(first_month_rec.year, first_month_rec.mon, 15) << 1
+    last_month_rec = month_counts.last.first
+    last_mon = Date.civil(last_month_rec.year, last_month_rec.mon, 15)
     report_data['by_month_min'] = [first_mon.year, first_mon.mon - 1, first_mon.day].join ','
     report_data['by_month_max'] = [last_mon.year, last_mon.mon - 1, last_mon.day].join ','
 
