@@ -10,7 +10,7 @@ TwstatWeb::Application.routes.draw do
   post 'twstat/cancel'
 
   get 'twstat' => 'twstat#index'
-  root :to => 'twstat#index'
+  root to: 'twstat#index'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

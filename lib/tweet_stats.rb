@@ -180,7 +180,7 @@ class TweetStats
       COUNT_DEFS.map { |period, _periodinfo|
         period_counts_by_dow = @all_counts[period][:by_dow]
         [
-          period, 
+          period,
           0.upto(6).map { |dow|
             "['#{DOWNAMES[dow]}', #{period_counts_by_dow[dow].to_i}, '#{make_tooltip DOWNAMES[dow], period_counts_by_dow[dow].to_i}', '#{COLORS[dow]}']"
           }.join(',')
