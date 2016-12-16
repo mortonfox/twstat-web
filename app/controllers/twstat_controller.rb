@@ -94,6 +94,10 @@ class TwstatController < ApplicationController
     @last_generated = @user.last_generated
     @cancel = @user.cancel
     @do_refresh = (@user_status['status'] == 'busy' || @user_status['status'] == 'waiting')
+
+    # When displaying the form, select what the user picked the last time. If
+    # this is the first time, use a default timezone.
+    @timezone = session[:timezone] || 'Eastern Time (US & Canada)'
   end
 
   def upload
@@ -104,6 +108,11 @@ class TwstatController < ApplicationController
     end
 
     uploaded_file = params[:tweetdata]
+    timezone = params[:timezone]
+
+    # Save the timezone that the user picked so we can select it the next time
+    # we display the form.
+    session[:timezone] = timezone
 
     if uploaded_file
       @uploadtemp = Tempfile.new ['tweetdata', '.zip'], encoding: 'ascii-8bit'
@@ -111,7 +120,7 @@ class TwstatController < ApplicationController
       @uploadtemp.close
 
       User.update_status userid: @userid, status: 'waiting'
-      TweetStats.new(userid: @userid, zipfile: @uploadtemp.path, timezone: 'America/New_York').delay.run
+      TweetStats.new(userid: @userid, zipfile: @uploadtemp.path, timezone: timezone).delay.run
     else
       flash[:formError] = 'Please select a file to upload.'
     end

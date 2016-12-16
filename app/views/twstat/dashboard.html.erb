@@ -61,6 +61,12 @@
 
       <br />
 
+      Select a time zone:
+      <%= time_zone_select(:time_zone, ActiveSupport::TimeZone.all, nil,
+                           { default: @timezone }, name: 'timezone', id: 'timezone') %>
+
+      <br />
+
       <button type="submit" class="btn btn-primary">Upload</button>
     </fieldset>
   <% end %>
