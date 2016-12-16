@@ -56,6 +56,3 @@ depending on your web hosting setup.
 ## Demo
 
 There is a live demo at <http://qslv.com/twstat>
-
-Note: The Tweets by Hour chart uses the UTC time zone since that's how Twitter
-stores timestamps in the Twitter archive.
