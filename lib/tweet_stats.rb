@@ -44,6 +44,7 @@ class TweetStats
   def initialize params = {}
     @userid = params[:userid]
     @zipfile = params[:zipfile]
+    @timezone = params[:timezone]
   end
 
   # Make a hash of counters, i.e. values default to 0 the first time.
@@ -76,7 +77,7 @@ class TweetStats
 
   # Archive entries before this point all have 00:00:00 as the time, so don't
   # include them in the by-hour chart.
-  ZERO_TIME_CUTOFF = Time.new(2010, 11, 4, 21)
+  ZERO_TIME_CUTOFF = Time.gm(2010, 11, 4, 21)
 
   def process_row row
     @row_count += 1
@@ -87,7 +88,7 @@ class TweetStats
     tstamp_str = row['timestamp']
     source_str = row['source']
     tweet_str = row['text']
-    tstamp = Time.parse tstamp_str
+    tstamp = Time.parse(tstamp_str).in_time_zone(@timezone)
 
     if @row_count % PROGRESS_INTERVAL == 0
       user = User.update_status userid: @userid, status: 'busy', tweets_done: @row_count, until_date: tstamp
