@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.5'
+gem 'rails', '5.0.1'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -23,7 +23,6 @@ end
 gem 'jquery-rails'
 
 gem 'oauth'
-gem 'json'
 
 gem 'delayed_job'
 gem 'delayed_job_active_record'
