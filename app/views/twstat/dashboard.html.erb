@@ -43,31 +43,33 @@
   <% end %>
   </p>
 
-  <%= form_tag({ :action => :upload }, :class => 'form-inline', :multipart => true) do %>
+  <%= form_tag({ :action => :upload }, :multipart => true) do %>
     <fieldset>
       <% if flash[:formError] %>
-        <div class="text-error">
+        <div class="form-group bg-danger">
           <%= flash[:formError] %>
         </div>
       <% end %>
 
-      <%= label_tag :tweetdata, 'Upload tweets.zip file: ' %>
+      <div class="form-group">
+        <%= label_tag :tweetdata, 'Upload tweets.zip file: ' %>
 
-      <div class="fileinput fileinput-new" data-provides="fileinput">
-        <span class="btn btn-default btn-file"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" id="tweetdata" name="tweetdata" /></span>
-        <span class="fileinput-preview"></span>
-        <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">×</a>
+        <div class="fileinput fileinput-new" data-provides="fileinput">
+          <span class="btn btn-default btn-file"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" id="tweetdata" name="tweetdata" /></span>
+          <span class="fileinput-preview"></span>
+          <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">×</a>
+        </div>
       </div>
 
-      <br />
+      <div class="form-group">
+        <%= label_tag :timezone, 'Select a time zone: ' %>
+        <%= time_zone_select(:time_zone, ActiveSupport::TimeZone.all, nil,
+                             { default: @timezone }, name: 'timezone', id: 'timezone') %>
+      </div>
 
-      Select a time zone:
-      <%= time_zone_select(:time_zone, ActiveSupport::TimeZone.all, nil,
-                           { default: @timezone }, name: 'timezone', id: 'timezone') %>
-
-      <br />
-
-      <button type="submit" class="btn btn-primary">Upload</button>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </div>
     </fieldset>
   <% end %>
 
