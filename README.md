@@ -52,7 +52,3 @@ equivalent at your web host.
 
 The `rails server` startup command may also differ or be eliminated entirely
 depending on your web hosting setup.
-
-## Demo
-
-There is a live demo at <http://qslv.com/twstat>
