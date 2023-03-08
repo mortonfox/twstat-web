@@ -81,7 +81,7 @@ GEM
       racc (~> 1.4)
     oauth (0.5.5)
     racc (1.5.2)
-    rack (2.2.3)
+    rack (2.2.6.3)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (5.0.1)
